@@ -1,17 +1,19 @@
 #include <assert.h>
+#include <string.h>
 
 #include "greatest/greatest.h"
+#include "../src/avl/bst.h"
 
-TEST x_should_equal_1(void) {
-  int x = 1;
-  ASSERT_EQ(1, x);
-  ASSERT_EQm("Yikes, x doesn't equal 1", 1, x);
-  ASSERT_EQ_FMT(1, x, "%d");
+TEST all_dispose(void) {
+  bst *p = bst_empty((int (*)(const void *, const void *)) strcmp);
+  bst_add_endofpath(p, "nullptr");
+  bst_dispose(&p);
+  ASSERT_EQ(p, nullptr);
   PASS();
 }
 
 SUITE(the_suite) {
-  RUN_TEST(x_should_equal_1);
+  RUN_TEST(all_dispose);
 }
 
 GREATEST_MAIN_DEFS();
