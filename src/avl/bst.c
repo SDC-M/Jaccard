@@ -78,6 +78,12 @@ static void cbst__update_height(cbst *p) {
   HEIGHT(p) = 1 + max__int(cbst__height(RIGHT(p)), cbst__height(LEFT(p)));
 }
 
+// cbst__update_size : met à jour la taille de l'arbre pointé par p en sommant
+//    la taille de ses deux sous-arbres plus un.
+static void cbst__update_size(cbst *p) {
+  SIZE(p) = 1 + add__size_t(cbst__size(RIGHT(p)), cbst__size(LEFT(p)));
+}
+
 // cbst__balance : si l'arbre binaire de recherche pointé par p est vide renvoie
 //     0 sinon renvoie la diffèrence entre son sous-arbre gauche et droit.
 static int cbst__balance(const cbst *p){
@@ -91,7 +97,9 @@ static void cbst__rotation_left(cbst **pp){
   *pp = RIGHT(p);
   RIGHT(p) = LEFT(*pp);
   LEFT(*pp) = p;
+  cbst__update_size(LEFT(*pp));
   cbst__update_height(LEFT(*pp));
+  cbst__update_size(*pp);
   cbst__update_height(*pp);
 }
 
@@ -102,7 +110,9 @@ static void cbst__rotation_right(cbst **pp){
   *pp = LEFT(p);
   LEFT(p) = RIGHT(*pp);
   RIGHT(*pp) = p;
+  cbst__update_size(RIGHT(*pp));
   cbst__update_height(RIGHT(*pp));
+  cbst__update_size(*pp);
   cbst__update_height(*pp);
 }
 
@@ -126,6 +136,7 @@ static void cbst__rotation_right_left(cbst **pp){
 //    par *pp soit équillibré pour la hauteur.
 static int cbst__balancing(cbst **pp){
   cbst__update_height(*pp);
+  cbst__update_size(*pp);
   int balance = cbst__balance(*pp);
   if (balance == 0 || balance == -1 || balance == 1){
     return 0;
@@ -156,6 +167,7 @@ static int cbst__balancing(cbst **pp){
 #else
 static int cbst__balancing(cbst **pp){
   cbst__update_height(*pp);
+  cbst__update_size(*pp);
   int balance = cbst__balance(*pp);
   if (balance == 0 || balance == -1 || balance == 1){
     return 0;
@@ -182,12 +194,6 @@ static int cbst__balancing(cbst **pp){
 #endif
 
 DEFUN_CBST__MEASURE(distance, min__size_t)
-
-// cbst__update_size : met à jour la taille de l'arbre pointé par p en sommant
-//    la taille de ses deux sous-arbres plus un.
-static void cbst__update_size(cbst *p) {
-  SIZE(p) = 1 + add__size_t(cbst__size(RIGHT(p)), cbst__size(LEFT(p)));
-}
 
 //  cbst__dispose : libère les ressources allouées à l'arbre binaire de
 //    recherche pointé par p.
@@ -372,7 +378,7 @@ static void cbst__repr_graphic(const cbst *p, void (*put)(const void *ref),
       printf((num % 2 == 1) ? REPR_RIGHT_BRANCH : REPR_LEFT_BRANCH);
     }
     put(REF(p));
-    printf(" b =  %d h = %d", cbst__balance(p), cbst__height(p));
+    printf(" b =  %d h = %d t = %zu", cbst__balance(p), cbst__height(p), cbst__size(p));
     printf("\n");
     cbst__repr_graphic(LEFT(p), put, level + 1, 2 * num);
   }

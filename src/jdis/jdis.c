@@ -3,9 +3,15 @@
 #include <string.h>
 #include "jdis.h"
 
-#define BUFFER_SIZE 1023
+#define STR(s) #s
+#define XSTR(s) STR(s)
+#define WORD_MAX_SIZE 50
 
-float bst_jdis(char *f1, char *f2) {
+//static void put(const void *p) {
+//printf("%s", (char *) p);
+//}
+
+double bst_jdis(char *f1, char *f2) {
   FILE *p1 = fopen(f1, "r");
   if (p1 == nullptr) {
     return 2.;
@@ -15,8 +21,8 @@ float bst_jdis(char *f1, char *f2) {
     fclose(p1);
     return 2.;
   }
-  char x[BUFFER_SIZE + 1];
-  char y[BUFFER_SIZE + 1];
+  char x[WORD_MAX_SIZE + 1];
+  char y[WORD_MAX_SIZE + 1];
   bst *uni = bst_empty((int (*)(const void *, const void *)) strcmp);
   bst *inter = bst_empty((int (*)(const void *, const void *)) strcmp);
   if (uni == nullptr || inter == nullptr) {
@@ -26,29 +32,48 @@ float bst_jdis(char *f1, char *f2) {
     fclose(p2);
     return 2.;
   }
-  int r1 = fscanf(p1, "%s", x);
-  int r2 = fscanf(p2, "%s", y);
+  int r1 = fscanf(p1, "%" XSTR(WORD_MAX_SIZE) "s", x);
+  int r2 = fscanf(p2, "%" XSTR(WORD_MAX_SIZE) "s", y);
   while (r1 != EOF || r2 != EOF) {
+    char *z1 = malloc(strlen(x) + 1);
+    char *z2 = malloc(strlen(y) + 1);
+    strcpy(z1, x);
+    strcpy(z2, y);
     if (r1 != EOF) {
-      if (bst_add_endofpath(uni, x) != x) {
-        bst_add_endofpath(inter, x);
-        r1 = fscanf(p1, "%s", x);
+      bst_add_endofpath(uni, z1);
+      if (strcmp(x, y) == 0) {
+        bst_add_endofpath(inter, z1);
       }
     }
     if (r2 != EOF) {
-      if (bst_add_endofpath(uni, y) != y) {
-        bst_add_endofpath(inter, y);
-        r2 = fscanf(p2, "%s", y);
-      }
+      bst_add_endofpath(uni, z2);
+    }
+    if (r1 != EOF) {
+      r1 = fscanf(p1, "%" XSTR(WORD_MAX_SIZE) "s", x);
+    }
+    if (r2 != EOF) {
+      r2 = fscanf(p2, "%" XSTR(WORD_MAX_SIZE) "s", y);
     }
   }
-  return 1 - (float)bst_size(inter) / (float)bst_size(uni);
+  //printf("union : \n");
+  //bst_repr_graphic(uni, put);
+  //printf("intersection : \n");
+  //bst_repr_graphic(inter, put);
+  printf("%f\n", (float) bst_size(uni));
+  printf("%f\n", (float) bst_size(inter));
+  fclose(p1);
+  fclose(p2);
+  double res = 1.0;
+  res = 1 - (double) bst_size(inter) / (double) bst_size(uni);
+  bst_dispose(&uni);
+  bst_dispose(&inter);
+  return res;
 }
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
     return -1;
   }
-  printf("%f", bst_jdis(argv[1], argv[2]));
+  printf("%.4lf\n", bst_jdis(argv[1], argv[2]));
   return 0;
 }
