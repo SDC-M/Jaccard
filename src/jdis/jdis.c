@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "jdis.h"
+
 #define STR(s) #s
 #define XSTR(s) STR(s)
 #define WORD_MAX_SIZE 50
@@ -43,7 +44,7 @@ double jdis(bst *p, bst *q, size_t card_interction) {
 }
 
 bst *file_to_bst(char *file_name, holdall *words) {
-  if (file_name == nullptr || words == nullptr){
+  if (file_name == nullptr || words == nullptr) {
     return nullptr;
   }
   FILE *p = fopen(file_name, "r");

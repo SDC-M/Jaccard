@@ -16,7 +16,7 @@ TEST all_dispose(void) {
   PASS();
 }
 
-TEST is_inside(void){
+TEST is_inside(void) {
   bst *p = bst_empty((int (*)(const void *, const void *)) strcmp);
   bst_add_endofpath(p, "nullptr");
   ASSERT_NEQ(p, nullptr);
@@ -26,15 +26,17 @@ TEST is_inside(void){
   PASS();
 }
 
-TEST jaccard_distance(void){
+TEST jaccard_distance(void) {
   holdall *words = holdall_empty();
-  bst *a = file_to_bst((char *)"../tests/x0.txt", words);
+  bst *a = file_to_bst((char *) "../tests/x0.txt", words);
   ASSERT_NEQ(a, nullptr);
-  bst *b = file_to_bst((char *)"../tests/x1.txt", words);
+  bst *b = file_to_bst((char *) "../tests/x1.txt", words);
   ASSERT_NEQ(b, nullptr);
-  bst *c = file_to_bst((char *)"../tests/x2.txt", words);
+  bst *c = file_to_bst((char *) "../tests/x2.txt", words);
   ASSERT_NEQ(c, nullptr);
   ASSERT_EQ(jdis(a, b, card_intersection(a, b)), 0.800);
+  ASSERT_GT(jdis(a, c, card_intersection(a, c)), 0.8666);
+  ASSERT_LT(jdis(a, c, card_intersection(a, c)), 0.8667);
   ASSERT_EQ(jdis(b, c, card_intersection(b, c)), 0.9375);
   bst_dispose(&a);
   bst_dispose(&b);
