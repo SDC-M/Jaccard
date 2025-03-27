@@ -1,11 +1,11 @@
 CC = gcc
 CFLAGS = -std=c2x \
   -Wall -Wconversion -Werror -Wextra -Wpedantic -Wwrite-strings \
-  -O0 -g3
+  -O2
 src = $(shell find ./src/ -name '*.c')
 executable = jdis
 
-src_test = tests/main.c tests/greatest/greatest.h $(shell find ./src/ -name '*.c' -not -name 'jdis.c')
+src_test = tests/main.c tests/greatest/greatest.h $(shell find ./src/ -name '*.c' -not -name 'main.c')
 executable_test = $(executable)_test
 makefile_indicator = .\#makefile\#
 
@@ -16,6 +16,7 @@ all: $(executable)
 clean:
 	$(RM) $(executable)
 	$(RM) $(executable_test)
+	$(RM) *.gcov *.gcno *.gcda
 	@$(RM) $(makefile_indicator)
 
 test: $(executable_test)
@@ -25,8 +26,9 @@ test: $(executable_test)
 $(executable): $(src)
 	$(CC) $(CFLAGS) -o $(executable) $^
 
+
 $(executable_test): $(src_test)
-	$(CC) $(CFLAGS) -o $(executable_test) -DTEST_MAIN $^
+	$(CC) $(CFLAGS) -fprofile-arcs -ftest-coverage -o $(executable_test) -DTEST_MAIN $^
 
 include $(makefile_indicator)
 

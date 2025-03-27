@@ -2,107 +2,39 @@
 #include <stdio.h>
 #include <string.h>
 #include "jdis.h"
-#include "../holdall/holdall.h"
-
-#define STR(s) #s
-#define XSTR(s) STR(s)
-#define WORD_MAX_SIZE 50
-
-typedef struct ctx ctx;
 
 struct ctx {
   bst *apply_set;
   size_t cptr;
 };
 
-int is_in(ctx *context, const void* ref){
-  if(bst_search(context->apply_set, ref) != nullptr){
+int is_in(ctx *context, const void *ref) {
+  if (bst_search(context->apply_set, ref) != nullptr) {
     context->cptr += 1;
   }
   return 0;
 }
 
-size_t card_intersection (bst *p, bst *q) {
+size_t card_intersection(bst *p, bst *q) {
   if (p == nullptr || q == nullptr) {
-    return (size_t)-1;
+    return (size_t) -1;
   }
   ctx *context = malloc(sizeof(*context));
   bst *apply = p;
   context->apply_set = q;
   context->cptr = 0;
-  if (bst_size(p) > bst_size(q)){
+  if (bst_size(p) > bst_size(q)) {
     apply = q;
     context->apply_set = p;
   }
-  bst_dft_infix_apply_context(apply, 0, context, (int (*)(void *context, const void *ref)) is_in, nullptr, nullptr);
+  bst_dft_infix_apply_context(apply, 0, context,
+      (int (*)(void *context, const void *ref)) is_in, nullptr, nullptr);
   size_t res = context->cptr;
   free(context);
   return res;
 }
 
-double jdis (bst *p, bst *q, size_t  card_interction){
-  return 1. - (double)card_interction / ((double) bst_size(p) + (double) bst_size(q) - (double)card_interction);
-}
-
-int rfree(void *ptr) {
-  free(ptr);
-  return 0;
-}
-
-int main(int argc, char *argv[]) {
-  if (argc < 3) {
-    return -1;
-  }
-  FILE *p1 = fopen(argv[1], "r");
-  if (p1 == nullptr) {
-    return 2.;
-  }
-  FILE *p2 = fopen(argv[2], "r");
-  if (p2 == nullptr) {
-    fclose(p1);
-    return 2.;
-  }
-  char x[WORD_MAX_SIZE + 1];
-  char y[WORD_MAX_SIZE + 1];
-  bst *bst_f1 = bst_empty((int (*)(const void *, const void *)) strcmp);
-  bst *bst_f2 = bst_empty((int (*)(const void *, const void *)) strcmp);
-  if (bst_f1 == nullptr || bst_f2 == nullptr) {
-    bst_dispose(&bst_f1);
-    bst_dispose(&bst_f2);
-    fclose(p1);
-    fclose(p2);
-    return 2.;
-  }
-  holdall *words = holdall_empty();
-  int r1 = fscanf(p1, "%" XSTR(WORD_MAX_SIZE) "s", x);
-  int r2 = fscanf(p2, "%" XSTR(WORD_MAX_SIZE) "s", y);
-  while (r1 != EOF || r2 != EOF) {
-    char *z1 = malloc(strlen(x) + 1);
-    char *z2 = malloc(strlen(y) + 1);
-    strcpy(z1, x);
-    strcpy(z2, y);
-    holdall_put(words, z1);
-    holdall_put(words, z2);
-    if (r1 != EOF) {
-      bst_add_endofpath(bst_f1, z1);
-    }
-    if (r2 != EOF) {
-      bst_add_endofpath(bst_f2, z2);
-    }
-    if (r1 != EOF) {
-      r1 = fscanf(p1, "%" XSTR(WORD_MAX_SIZE) "s", x);
-    }
-    if (r2 != EOF) {
-      r2 = fscanf(p2, "%" XSTR(WORD_MAX_SIZE) "s", y);
-    }
-  }
-  size_t card_in = card_intersection(bst_f1, bst_f2);
-  printf("%lf\n", jdis(bst_f1, bst_f2, card_in));
-  fclose(p1);
-  fclose(p2);
-  bst_dispose(&bst_f1);
-  bst_dispose(&bst_f2);
-  holdall_apply(words, rfree);
-  holdall_dispose(&words);
-  return 0;
+double jdis(bst *p, bst *q, size_t card_interction) {
+  return 1. - (double) card_interction
+    / ((double) bst_size(p) + (double) bst_size(q) - (double) card_interction);
 }
