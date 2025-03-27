@@ -86,13 +86,13 @@ static void cbst__update_size(cbst *p) {
 
 // cbst__balance : si l'arbre binaire de recherche pointé par p est vide renvoie
 //     0 sinon renvoie la diffèrence entre son sous-arbre gauche et droit.
-static int cbst__balance(const cbst *p){
+static int cbst__balance(const cbst *p) {
   return IS_EMPTY(p) ? 0 : cbst__height(LEFT(p)) - cbst__height(RIGHT(p));
 }
 
 // cbst__rotation_left : effectue une simple rotation gauche  de l'arbre pointé
 //     par *pp.
-static void cbst__rotation_left(cbst **pp){
+static void cbst__rotation_left(cbst **pp) {
   cbst *p = *pp;
   *pp = RIGHT(p);
   RIGHT(p) = LEFT(*pp);
@@ -105,7 +105,7 @@ static void cbst__rotation_left(cbst **pp){
 
 // cbst__rotation_right : effectue une simple rotation droite de l'arbre pointé
 //     par *pp.
-static void cbst__rotation_right(cbst **pp){
+static void cbst__rotation_right(cbst **pp) {
   cbst *p = *pp;
   *pp = LEFT(p);
   LEFT(p) = RIGHT(*pp);
@@ -118,14 +118,14 @@ static void cbst__rotation_right(cbst **pp){
 
 // cbst__rotation_left_right : effectue une double rotation gauche droite de
 //    l'arbre pointé par *pp.
-static void cbst__rotation_left_right(cbst **pp){
+static void cbst__rotation_left_right(cbst **pp) {
   cbst__rotation_left(&LEFT(*pp));
   cbst__rotation_right(pp);
 }
 
 // cbst__rotation_right_left : effectue une double rotation droite gauche de
 //    l'arbre pointé par *pp.
-static void cbst__rotation_right_left(cbst **pp){
+static void cbst__rotation_right_left(cbst **pp) {
   cbst__rotation_right(&(RIGHT(*pp)));
   cbst__rotation_left(pp);
 }
@@ -134,26 +134,24 @@ static void cbst__rotation_right_left(cbst **pp){
 
 // cbst__balancing : effectue les rotations nécéssaire pour que l'arbre pointé
 //    par *pp soit équillibré pour la hauteur.
-static int cbst__balancing(cbst **pp){
+static int cbst__balancing(cbst **pp) {
   cbst__update_height(*pp);
   cbst__update_size(*pp);
   int balance = cbst__balance(*pp);
-  if (balance == 0 || balance == -1 || balance == 1){
+  if (balance == 0 || balance == -1 || balance == 1) {
     return 0;
-  }
-  else if (balance == 2){
+  } else if (balance == 2) {
     int ba = cbst__balance(LEFT(*pp));
-    if (ba == 1 || ba == 0){
+    if (ba == 1 || ba == 0) {
       printf("right\n");
       cbst__rotation_right(pp);
     } else {
       printf("left right\n");
       cbst__rotation_left_right(pp);
     }
-  }
-  else if(balance == -2){
+  } else if (balance == -2) {
     int ba = cbst__balance(RIGHT(*pp));
-    if (ba == -1 || ba == 0){
+    if (ba == -1 || ba == 0) {
       printf("left\n");
       cbst__rotation_left(pp);
     } else {
@@ -165,24 +163,22 @@ static int cbst__balancing(cbst **pp){
 }
 
 #else
-static int cbst__balancing(cbst **pp){
+static int cbst__balancing(cbst **pp) {
   cbst__update_height(*pp);
   cbst__update_size(*pp);
   int balance = cbst__balance(*pp);
-  if (balance == 0 || balance == -1 || balance == 1){
+  if (balance == 0 || balance == -1 || balance == 1) {
     return 0;
-  }
-  else if (balance == 2){
+  } else if (balance == 2) {
     int ba = cbst__balance(LEFT(*pp));
-    if (ba == 1 || ba == 0){
+    if (ba == 1 || ba == 0) {
       cbst__rotation_right(pp);
     } else {
       cbst__rotation_left_right(pp);
     }
-  }
-  else if(balance == -2){
+  } else if (balance == -2) {
     int ba = cbst__balance(RIGHT(*pp));
-    if (ba == -1 || ba == 0){
+    if (ba == -1 || ba == 0) {
       cbst__rotation_left(pp);
     } else {
       cbst__rotation_right_left(pp);
@@ -245,7 +241,6 @@ static void *cbst__add_endofpath(cbst **pp, const void *ref,
     return res;
   }
 }
-
 
 // cbst__remove_max : supprime le noeud ayant la valeur maximale dans l'arbre
 //    de recherche pointée par *pp.
@@ -378,10 +373,40 @@ static void cbst__repr_graphic(const cbst *p, void (*put)(const void *ref),
       printf((num % 2 == 1) ? REPR_RIGHT_BRANCH : REPR_LEFT_BRANCH);
     }
     put(REF(p));
-    printf(" b =  %d h = %d t = %zu", cbst__balance(p), cbst__height(p), cbst__size(p));
+    printf(" b =  %d h = %d t = %zu", cbst__balance(p), cbst__height(p),
+        cbst__size(p));
     printf("\n");
     cbst__repr_graphic(LEFT(p), put, level + 1, 2 * num);
   }
+}
+
+static int cbst__dft_infix_apply_context(cbst *t  , int dir,
+    void *context, int (*fun)(void *context, const void *ref),
+    int (*fun_pre)(void *context), int (*fun_post)(void *context)) {
+  if (t == nullptr) {
+    return 0;
+  }
+  cbst *fst = dir <= 0 ? RIGHT(t) : LEFT(t);
+  cbst *snd = dir > 0 ? RIGHT(t) : LEFT(t);
+  if (fun_pre != nullptr) {
+    int r = 0;
+    if ((r = fun_pre(context)) != 0) {
+      return r;
+    }
+  }
+  cbst__dft_infix_apply_context(fst, dir, context, fun, fun_pre, fun_post);
+  int r = 0;
+  if ((r = fun(context, REF(t))) != 0) {
+    return r;
+  }
+  if (fun_post != nullptr) {
+    int r = 0;
+    if ((r = fun_post(context)) != 0) {
+      return r;
+    }
+  }
+  cbst__dft_infix_apply_context(snd, dir, context, fun, fun_pre, fun_post);
+  return 0;
 }
 
 //=== Type bst =================================================================
@@ -460,4 +485,11 @@ void bst_repr_graphic(bst *t, void (*put)(const void *ref)) {
     return;
   }
   cbst__repr_graphic(t->root, put, 0, 1);
+}
+
+int bst_dft_infix_apply_context(bst *t, int dir,
+    void *context, int (*fun)(void *context, const void *ref),
+    int (*fun_pre)(void *context), int (*fun_post)(void *context)) {
+  return cbst__dft_infix_apply_context(t->root, dir, context, fun, fun_pre,
+        fun_post);
 }
