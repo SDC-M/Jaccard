@@ -1,13 +1,13 @@
-#include "bst.h"
+#include "../avl/bst.h"
 
 // help : Affiche le menu d'aide sur la sortie standard et renvoie 0.
-extern int help();
+extern int help(void);
 
 // graph_belonging : Affiche le graphe d'appartenance des mots dans les fichiers
 // dans argv.
-extern int graph_belonging(bst *t, int fst_file, int argc, char *argv[]);
+extern int graph_belonging(bst **t, bst *uni);
 
-// set_max_value : Fixe value à la limit si value est nulle sinon fixe la
+ //set_max_value : Fixe value à la limit si value est nulle sinon fixe la
 // longueur maximale des mots à value
 extern int set_max_value(int value, int limit);
 

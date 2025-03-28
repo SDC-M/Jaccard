@@ -5,6 +5,7 @@
 #include "avl/bst.h"
 #include "holdall/holdall.h"
 #include "jdis/jdis.h"
+#include "op/op.h"
 
 int rfree(void *ptr) {
   free(ptr);
@@ -29,6 +30,17 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
   }
+
+  bst *uni = bst_empty((int (*)(const void *, const void *)) strcoll);
+
+  //choldall *q = *words;
+
+  //while (q != nullptr){
+    //bst_add_endofpath(uni, q->ref);
+    //q->next;
+  //}
+
+  graph_belonging(tab, uni);
   for (int i = 0; i < argc - 2; ++i) {
     for (int j = i + 1; j < argc - 1; ++j) {
       size_t card_in = card_intersection(tab[i], tab[j]);
@@ -37,6 +49,7 @@ int main(int argc, char *argv[]) {
           argv[j + 1], jaccard_distance);
     }
   }
+
   for (int i = 0; i < argc - 1; ++i) {
     bst_dispose(&tab[i]);
   }

@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int help() {
+#include "op.h"
+
+int help(void) {
   fprintf(stdout,
       "Here's a list of the operation on the module Jaccard dissimilarity :\n");
   fprintf(stdout, "\t -? : Affiche ce menu d'aide\n");
@@ -18,33 +20,23 @@ int help() {
   return 0;
 }
 
-int graph_belonging(bst **t, int (*compar)(const void *, const void *)) {
-  bst *union = bst_empty(compar);
-  bst *q = t;
-  // union de tous les arbres du tableau de bst pointé de *t
-  while (q != nullptr) {
-    bst_dft_infix_apply_context(q, 0, union, bst_add_endofpath, bst_search,
-        bst_search);
-    q += 1;
+static int scptr_display(bst *context, const char *ref) {
+  printf("%s\t", ref);
+  if (bst_search(context, ref) != nullptr) {
+    printf("x\t");
+  } else {
+    printf("-\t");
   }
+  return printf("\n");
+}
+
+int graph_belonging(bst **t, bst *uni) {
   // affichage graphique
-  return bst_dft_infix_apply_context(union, 0, t, scptr_display, nullptr,
+  return bst_dft_infix_apply_context(uni, 0, t,(int (*)(void *, const void *)) scptr_display, nullptr,
         nullptr);
 }
 
-static int scptr_display(bst **context, const char *ref, ) {
-  bst *q = *context;
-  printf("%s\t", *ref);
-  while (q != nullptr) {
-    if (bst_search(q, ref) != nullptr) {
-      printf("x\t");
-    } else {
-      printf("-\t");
-    }
-    ++q;
-  }
-  printf("\n");
-}
+
 
 int set_max_value(int value, int limit) {
   if (value == 0) {
