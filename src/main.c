@@ -8,22 +8,7 @@
 #include "avl/bst.h"
 #include "holdall/holdall.h"
 #include "jdis/jdis.h"
-
-void help(void) {
-  fprintf(stdout,
-      "Liste des opérations réalisables :\n\n");
-  fprintf(stdout, " -? : Affiche ce menu d'aide.\n");
-  fprintf(stdout,
-      " -g : Affiche le graphe d'appartenance des mots."
-      "dans les fichiers passés sur la ligne de commande.\n");
-  fprintf(stdout, " -i VALUE : permet de fixer la longueur maximale."
-      "des mots à VALUE\n");
-  fprintf(stdout, " -p : Considère les caractères de ponctuation."
-      "comme des caractères d'espacement.\n");
-  fprintf(stdout,
-      " -- : Indique que l'argument qui suit doit être "
-      "considéré comme un fichier.\n");
-}
+#include "op/op.h"
 
 int rfree(void *ptr) {
   free(ptr);
@@ -33,7 +18,7 @@ int rfree(void *ptr) {
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
   int option;
-  while ((option = getopt(argc, argv, "?p-:i:")) != -1) {
+  while ((option = getopt(argc, argv, "?pg-:i:")) != -1) {
     switch (option) {
       case '?':
         help();
@@ -46,6 +31,9 @@ int main(int argc, char *argv[]) {
         break;
       case 'i':
         printf("long max mot : %d\n", atoi(optarg));
+        break;
+      case 'g':
+        printf("affichage graphique : on\n");
         break;
       default:
         return EXIT_FAILURE;
