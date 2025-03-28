@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "bst.h"
+#include <stdio.h>
 
 int help() {
   fprintf(stdout, "Calcul distance de Jaccard\n");
@@ -17,10 +17,35 @@ int help() {
   return 0;
 }
 
-int graph_belonging(/*Paramètre WIP*/) {
+//EN SUPPOSANT QU'ON MET TOUTES LES OPTIONS D'ABORD ET QUE TOUS LES FICHIERS SE
+// SUIVENT SUR LA LIGNE DE COMMANDE
 
+//int graph_belonging(bst **t) {
+  //bst *union = bst_empty((*t)->);
+//}
+
+//static int scptr_display(const char *ref){
+  //return printf();
+//}
+
+int set_max_value(int value, int limit){
+  if (value == 0){
+    value = limit;
+  }
+  return 0;
 }
 
-int set_maxlength()
-
-// rfree : libère la mémoire pointé par ptr et renvoie 0.
+// MANQUE UN PARAMÈTRE OU ON STOCKE LE RÉSULTAT DE LA FONCTION
+// MANQUE GESTION D'ERREUR
+int punctuation_like_space(char *buffer){
+  char *m1;
+  char *p = buffer;
+  while(p != nullptr){
+    if (*p == '.' && *p != ';' && *p != ',' && *p != '-'){
+      *m1 = *p;
+      m1 += 1;
+      p += 1;
+    }
+  }
+  return 0;
+}
