@@ -2,7 +2,8 @@
 #include <stdio.h>
 
 int help() {
-  fprintf(stdout, "Calcul distance de Jaccard\n");
+  fprintf(stdout,
+      "Here's a list of the operation on the module Jaccard dissimilarity :\n");
   fprintf(stdout, "\t -? : Affiche ce menu d'aide\n");
   fprintf(stdout,
       "\t -g : Affiche le graphe d'appartenance des mots "
@@ -17,19 +18,36 @@ int help() {
   return 0;
 }
 
-//EN SUPPOSANT QU'ON MET TOUTES LES OPTIONS D'ABORD ET QUE TOUS LES FICHIERS SE
-// SUIVENT SUR LA LIGNE DE COMMANDE
+int graph_belonging(bst **t, int (*compar)(const void *, const void *)) {
+  bst *union = bst_empty(compar);
+  bst *q = t;
+  // union de tous les arbres du tableau de bst pointé de *t
+  while (q != nullptr) {
+    bst_dft_infix_apply_context(q, 0, union, bst_add_endofpath, bst_search,
+        bst_search);
+    q += 1;
+  }
+  // affichage graphique
+  return bst_dft_infix_apply_context(union, 0, t, scptr_display, nullptr,
+        nullptr);
+}
 
-//int graph_belonging(bst **t) {
-  //bst *union = bst_empty((*t)->);
-//}
+static int scptr_display(bst **context, const char *ref, ) {
+  bst *q = *context;
+  printf("%s\t", *ref);
+  while (q != nullptr) {
+    if (bst_search(q, ref) != nullptr) {
+      printf("x\t");
+    } else {
+      printf("-\t");
+    }
+    ++q;
+  }
+  printf("\n");
+}
 
-//static int scptr_display(const char *ref){
-  //return printf();
-//}
-
-int set_max_value(int value, int limit){
-  if (value == 0){
+int set_max_value(int value, int limit) {
+  if (value == 0) {
     value = limit;
   }
   return 0;
@@ -37,11 +55,11 @@ int set_max_value(int value, int limit){
 
 // MANQUE UN PARAMÈTRE OU ON STOCKE LE RÉSULTAT DE LA FONCTION
 // MANQUE GESTION D'ERREUR
-int punctuation_like_space(char *buffer){
+int punctuation_like_space(char *buffer) {
   char *m1;
   char *p = buffer;
-  while(p != nullptr){
-    if (*p == '.' && *p != ';' && *p != ',' && *p != '-'){
+  while (p != nullptr) {
+    if (*p == '.' && *p != ';' && *p != ',' && *p != '-') {
       *m1 = *p;
       m1 += 1;
       p += 1;
