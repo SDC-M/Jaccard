@@ -15,8 +15,17 @@ int rfree(void *ptr) {
   return 0;
 }
 
+int add_element(bst *t, const void *ref) {
+  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
+}
+
+//void put(const char *ref) {
+  //printf("%s", ref);
+//}
+
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
+  bool graph = false;
   int option;
   while ((option = getopt(argc, argv, "?pg-:i:")) != -1) {
     switch (option) {
@@ -34,6 +43,7 @@ int main(int argc, char *argv[]) {
         break;
       case 'g':
         printf("affichage graphique : on\n");
+        graph = true;
         break;
       default:
         return EXIT_FAILURE;
@@ -65,6 +75,25 @@ int main(int argc, char *argv[]) {
           jaccard_distance);
     }
   }
+  if (graph) {
+    bst *uni = bst_empty((int (*)(const void *, const void *)) strcoll);
+    if (uni == nullptr) {
+      fprintf(stderr, "Erreur d'allocation sur l'Union");
+      goto dispose;
+    }
+    for (int i = 0; i < argc - optind; ++i) {
+      bst_dft_infix_apply_context(tab[i], 0, uni,
+          (int (*)(void *, const void *)) add_element, nullptr, nullptr);
+    }
+    for (int i = 0; i < argc - optind; ++i) {
+      printf("\t%s", argv[i + optind]);
+    }
+    printf("\n");
+    //bst_repr_graphic(uni, (void (*)(const void *)) put);
+    graph_belonging(tab, uni, argc - optind);
+    bst_dispose(&uni);
+  }
+dispose:
   for (int i = 0; i < argc - optind; ++i) {
     bst_dispose(&tab[i]);
   }

@@ -3,6 +3,13 @@
 
 #include "op.h"
 
+typedef struct context context;
+
+struct context{
+  bst **t;
+  int nb_bst;
+};
+
 void help(void) {
   fprintf(stdout,
       "Liste des opérations réalisables :\n\n");
@@ -19,22 +26,32 @@ void help(void) {
       "considéré comme un fichier.\n");
 }
 
-static int scptr_display(bst *context, const char *ref) {
+static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
-  if (bst_search(context, ref) != nullptr) {
-    printf("x\t");
-  } else {
-    printf("-\t");
+  for (int i = 0; i < ctx->nb_bst; ++i){
+    if (bst_search(ctx->t[i], ref) != nullptr) {
+      printf("x\t");
+    } else {
+      printf("-\t");
+    }
   }
-  return printf("\n");
+  printf("\n");
+  return 0;
 }
 
-int graph_belonging(bst **t, bst *uni) {
-  return bst_dft_infix_apply_context(uni, 0, t,(int (*)(void *, const void *)) scptr_display, nullptr,
-        nullptr);
+int graph_belonging(bst **t, bst *uni, int nb_file) {
+  context *ctx = malloc(sizeof *ctx);
+  if (ctx == nullptr){
+    return -1;
+  }
+  ctx->nb_bst = nb_file;
+  ctx->t = t;
+  bst_dft_infix_apply_context(uni, 1, ctx,
+  (int (*)(void *, const void *)) scptr_display, nullptr,
+  nullptr);
+  free(ctx);
+  return 0;
 }
-
-
 
 int set_max_value(int value, int limit) {
   if (value == 0) {
