@@ -5,7 +5,7 @@ extern void help(void);
 
 // graph_belonging : Affiche le graphe d'appartenance des mots dans les fichiers
 //  dans argv.
-extern int graph_belonging(bst **t, bst *uni);
+extern int graph_belonging(bst **t, bst *uni, int nb_file);
 
  // set_max_value : Fixe value à la limit si value est nulle sinon fixe la
 //  longueur maximale des mots à value
