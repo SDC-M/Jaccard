@@ -1,8 +1,6 @@
 # Jaccard
 Project about Jaccard distance implements by AVL.
 
-##### --------------------------------------------------------------------------
-
 ## TODO
 
 [O] - Comment convertir la valuer max rentrer à l'aide de l'option -i sachant
@@ -11,9 +9,6 @@ Project about Jaccard distance implements by AVL.
 [O] - Gérer l'option de ponctuation.
 
 [O] - Gérer l'ajout de fichier par l'option -- (code à retravailler)
-
-
-##### --------------------------------------------------------------------------
 
 ## Optionnel
 
