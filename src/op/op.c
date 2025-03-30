@@ -16,16 +16,12 @@ void help(void) {
       " -g : Affiche le graphe d'appartenance des mots."
       "dans les fichiers passés sur la ligne de commande.\n");
   fprintf(stdout, " -i VALUE : permet de fixer la longueur maximale."
-      "des mots à VALUE\n");
+      "des mots à VALUE.\n");
   fprintf(stdout, " -p : Considère les caractères de ponctuation."
       "comme des caractères d'espacement.\n");
   fprintf(stdout,
       " -- : Indique que l'argument qui suit doit être "
       "considéré comme un fichier.\n");
-}
-
-int add_element(bst *t, const void *ref) {
-  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
 }
 
 static int scptr_display(context *ctx, const char *ref) {

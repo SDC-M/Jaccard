@@ -17,8 +17,3 @@ extern int set_max_value(int value, int limit);
 //  Sinon découpe le buffer en plusieurs mots sans les caractères de
 // ponctuation.
 extern int punctuation_like_space(char *buffer);
-
-// add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
-// dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
-// une valeur différente de nulle sinon
-extern int add_element(bst *t, const void *ref);

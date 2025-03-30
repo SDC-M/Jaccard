@@ -15,14 +15,18 @@ int rfree(void *ptr) {
   return 0;
 }
 
-//void put(const char *ref) {
-  //printf("%s", ref);
-//}
+// add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
+// dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
+// une valeur différente de nulle sinon
+int add_element(bst *t, const void *ref) {
+  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
+}
 
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
   bool graph = false;
   int option;
+  int ajout_fichier = 0;
   while ((option = getopt(argc, argv, "?pg-:i:")) != -1) {
     switch (option) {
       case '?':
@@ -33,19 +37,19 @@ int main(int argc, char *argv[]) {
         break;
       case '-':
         printf("fichier : %s\n", optarg);
+        ajout_fichier += 1;
         break;
       case 'i':
-        printf("long max mot : %d\n", atoi(optarg));
+        //value_max = atoi(optarg);
         break;
       case 'g':
-        printf("affichage graphique : on\n");
         graph = true;
         break;
       default:
         return EXIT_FAILURE;
     }
   }
-  if (argc - optind < 2) {
+  if (argc - optind + ajout_fichier < 2) {
     fprintf(stderr,
         "Pas assez d'arguments.\n");
     return EXIT_FAILURE;
@@ -55,7 +59,8 @@ int main(int argc, char *argv[]) {
   for (int i = optind; i < argc; ++i) {
     tab[i - optind] = file_to_bst(argv[i], words);
     if (tab[i - optind] == nullptr) {
-      fprintf(stderr, "*** Échec : %s\n", argv[i]);
+      fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
+          argv[i]);
       for (int j = optind; j < i; ++j) {
         bst_dispose(&tab[j - optind]);
       }
@@ -85,7 +90,6 @@ int main(int argc, char *argv[]) {
       printf("\t%s", argv[i + optind]);
     }
     printf("\n");
-    //bst_repr_graphic(uni, (void (*)(const void *)) put);
     graph_belonging(tab, uni, argc - optind);
     bst_dispose(&uni);
   }
