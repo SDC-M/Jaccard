@@ -6,6 +6,7 @@
 #include "../src/avl/bst.h"
 #include "../src/holdall/holdall.h"
 #include "../src/jdis/jdis.h"
+#include "../src/op/op.h"
 
 TEST all_dispose(void) {
   bst *p = bst_empty((int (*)(const void *, const void *)) strcmp);
@@ -44,10 +45,31 @@ TEST jaccard_distance(void) {
   PASS();
 }
 
+TEST print_graph (void) {
+  holdall *words = holdall_empty();
+  bst *a = file_to_bst((char *) "../tests/x0.txt", words);
+  ASSERT_NEQ(a, nullptr);
+  bst *b = file_to_bst((char *) "../tests/x1.txt", words);
+  ASSERT_NEQ(b, nullptr);
+  bst *uni = bst_empty((int (*)(const void *, const void *)) strcmp);
+  ASSERT_NEQ(uni, nullptr);
+  bst *t[2] = {a, b};
+  for (int i = 0; i < 2; ++i) {
+      bst_dft_infix_apply_context(t[i], 0, uni,
+          (int (*)(void *, const void *)) add_element, nullptr, nullptr);
+  }
+  ASSERT_EQ(graph_belonging(t, uni, 2), 0);
+  bst_dispose(&a);
+  bst_dispose(&b);
+  bst_dispose(&uni);
+  PASS();
+}
+
 SUITE(the_suite) {
   RUN_TEST(all_dispose);
   RUN_TEST(is_inside);
   RUN_TEST(jaccard_distance);
+  RUN_TEST(print_graph);
 }
 
 GREATEST_MAIN_DEFS();

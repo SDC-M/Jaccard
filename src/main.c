@@ -15,10 +15,6 @@ int rfree(void *ptr) {
   return 0;
 }
 
-int add_element(bst *t, const void *ref) {
-  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
-}
-
 //void put(const char *ref) {
   //printf("%s", ref);
 //}

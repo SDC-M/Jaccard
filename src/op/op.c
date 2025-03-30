@@ -3,8 +3,6 @@
 
 #include "op.h"
 
-typedef struct context context;
-
 struct context{
   bst **t;
   int nb_bst;
@@ -24,6 +22,10 @@ void help(void) {
   fprintf(stdout,
       " -- : Indique que l'argument qui suit doit être "
       "considéré comme un fichier.\n");
+}
+
+int add_element(bst *t, const void *ref) {
+  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
 }
 
 static int scptr_display(context *ctx, const char *ref) {
