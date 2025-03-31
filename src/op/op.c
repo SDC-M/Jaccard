@@ -50,25 +50,3 @@ int graph_belonging(bst **t, bst *uni, int nb_file) {
   free(ctx);
   return 0;
 }
-
-int set_max_value(int value, int limit) {
-  if (value == 0) {
-    value = limit;
-  }
-  return 0;
-}
-
-// MANQUE UN PARAMÈTRE OU ON STOCKE LE RÉSULTAT DE LA FONCTION
-// MANQUE GESTION D'ERREUR
-int punctuation_like_space(char *buffer) {
-  char *m1;
-  char *p = buffer;
-  while (p != nullptr) {
-    if (*p == '.' && *p != ';' && *p != ',' && *p != '-') {
-      *m1 = *p;
-      m1 += 1;
-      p += 1;
-    }
-  }
-  return 0;
-}

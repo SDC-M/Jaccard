@@ -3,9 +3,10 @@
 #include <string.h>
 #include "jdis.h"
 
-#define STR(s) #s
-#define XSTR(s) STR(s)
 #define WORD_MAX_SIZE 50
+
+#define PUNC_SEPARATORS "“`‘\'\"-_)(;,!?:.'\n "
+#define CLASSIC_SEPARATORS "\n "
 
 struct ctx {
   bst *apply_set;
@@ -43,7 +44,28 @@ double jdis(bst *p, bst *q, size_t card_interction) {
     / ((double) bst_size(p) + (double) bst_size(q) - (double) card_interction);
 }
 
-bst *file_to_bst(char *file_name, holdall *words) {
+// hm__fscanf : tente de lire dans le fichier pointé par stream au plus
+//  value_max caractères, stocke dans la zone pointée par buffer et si wp est à
+//  vrai alors gère la ponctuation comme séparateur.
+static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
+  int c;
+  char *p = buffer;
+  int cptr = 0;
+  const char *punc = wp == true ? PUNC_SEPARATORS : CLASSIC_SEPARATORS;
+  while ((c = fgetc(stream)) != EOF) {
+    if (strchr(punc, c) != nullptr || cptr >= value_max) {
+      *p = '\0';
+      return 0;
+    }
+    *p = (char) c;
+    ++p;
+    ++cptr;
+  }
+  *p = '\0';
+  return EOF;
+}
+
+bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
   if (file_name == nullptr || words == nullptr) {
     return nullptr;
   }
@@ -51,13 +73,16 @@ bst *file_to_bst(char *file_name, holdall *words) {
   if (p == nullptr) {
     return nullptr;
   }
-  char x[WORD_MAX_SIZE + 1];
+  if (value_max == 0) {
+    value_max = WORD_MAX_SIZE;
+  }
+  char x[value_max + 1];
   bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (bst_f == nullptr) {
     fclose(p);
     return nullptr;
   }
-  int r = fscanf(p, "%" XSTR(WORD_MAX_SIZE) "s", x);
+  int r = hm__fscanf(p, value_max, x, wp);
   while (r != EOF) {
     char *z = malloc(strlen(x) + 1);
     strcpy(z, x);
@@ -67,7 +92,7 @@ bst *file_to_bst(char *file_name, holdall *words) {
       bst_dispose(&bst_f);
       return nullptr;
     }
-    r = fscanf(p, "%" XSTR(WORD_MAX_SIZE) "s", x);
+    r = hm__fscanf(p, value_max, x, wp);
   }
   fclose(p);
   return bst_f;
