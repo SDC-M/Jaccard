@@ -82,6 +82,7 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
     }
     rewind(p);
   } else {
+    printf("ici %s\n", file_name);
     if (file_name == nullptr || words == nullptr) {
       return nullptr;
     }
