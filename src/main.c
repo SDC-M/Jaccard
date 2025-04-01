@@ -10,6 +10,42 @@
 #include "jdis/jdis.h"
 #include "op/op.h"
 
+//------------------------------------------------------------------------------
+
+#define WORD_MAX_SIZE 50
+
+#define PUNC_SEPARATORS "“`‘\'\"-_)(;,!?:.'\n "
+#define CLASSIC_SEPARATORS "\n "
+
+
+// hm__fscanf : tente de lire dans le fichier pointé par stream au plus
+//  value_max caractères, stocke dans la zone pointée par buffer et si wp est à
+//  vrai alors gère la ponctuation comme séparateur.
+static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
+  int c;
+  char *p = buffer;
+  int cptr = 0;
+  const char *punc = wp == true ? PUNC_SEPARATORS : CLASSIC_SEPARATORS;
+  while ((c = fgetc(stream)) != EOF) {
+    if (strchr(punc, c) != nullptr || cptr >= value_max) {
+      *p = '\0';
+      return 0;
+    }
+    *p = (char) c;
+    ++p;
+    ++cptr;
+  }
+  *p = '\0';
+  return EOF;
+}
+
+
+void put(const void *p) {
+  printf("%s", (const char *)p);
+}
+
+//------------------------------------------------------------------------------
+
 int rfree(void *ptr) {
   free(ptr);
   return 0;
@@ -58,10 +94,48 @@ int main(int argc, char *argv[]) {
   bst **tab = malloc((size_t) (argc - optind + escaped_file) * sizeof(bst *));
   for (int i = optind - escaped_file; i < argc; ++i) {
     printf("%s\n", argv[i]);
-    if (strcmp(argv[i], "-") == 0){
-      printf("là\n");
+    if (strcmp(argv[i], "-") == 0) {
+      FILE *p = tmpfile();
+      if (p == nullptr) {
+        fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
+        goto dispose;
+      }
+      int c;
+      while ((c = fgetc(stdin)) != EOF) {
+        printf("%c", c);
+        fputc(c, p);
+      }
+      rewind(p);
+      if (value_max == 0) {
+        value_max = WORD_MAX_SIZE;
+      }
+      char x[value_max + 1];
+      bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
+      if (bst_f == nullptr) {
+        fclose(p);
+      }
+      int r = hm__fscanf(p, value_max, x, want_punc);
+      while (r != EOF) {
+        char *z = malloc(strlen(x) + 1);
+        strcpy(z, x);
+        char *res;
+        if ((res = bst_add_endofpath(bst_f, z)) == nullptr) {
+          fclose(p);
+          bst_dispose(&bst_f);
+        }
+        if (res == z) {
+          holdall_put(words, z);
+        } else {
+          free(z);
+        }
+        r = hm__fscanf(p, value_max, x, want_punc);
+      }
+      fclose(p);
+      bst_repr_graphic(bst_f, put);
+      tab[i - optind] = bst_f;
+    } else {
+      tab[i - optind] = file_to_bst(argv[i], words, value_max, want_punc);
     }
-    tab[i - optind] = file_to_bst(argv[i], words, value_max, want_punc);
     if (tab[i - optind] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
           argv[i]);
