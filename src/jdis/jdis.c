@@ -86,14 +86,20 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
   while (r != EOF) {
     char *z = malloc(strlen(x) + 1);
     strcpy(z, x);
-    holdall_put(words, z);
-    if (bst_add_endofpath(bst_f, z) == nullptr) {
+    char *res;
+    if ((res = bst_add_endofpath(bst_f, z)) == nullptr) {
       fclose(p);
       bst_dispose(&bst_f);
       return nullptr;
+    }
+    if (res == z){
+      holdall_put(words, z);
+    } else {
+      free(z);
     }
     r = hm__fscanf(p, value_max, x, wp);
   }
   fclose(p);
   return bst_f;
 }
+

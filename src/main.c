@@ -57,6 +57,10 @@ int main(int argc, char *argv[]) {
   holdall *words = holdall_empty();
   bst **tab = malloc((size_t) (argc - optind + escaped_file) * sizeof(bst *));
   for (int i = optind - escaped_file; i < argc; ++i) {
+    printf("%s\n", argv[i]);
+    if (strcmp(argv[i], "-") == 0){
+      printf("là\n");
+    }
     tab[i - optind] = file_to_bst(argv[i], words, value_max, want_punc);
     if (tab[i - optind] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
