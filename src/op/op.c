@@ -22,6 +22,8 @@ void help(void) {
   fprintf(stdout,
       " -- : Indique que l'argument qui suit doit être "
       "considéré comme un fichier.\n");
+  fprintf(stdout, " - : À la place d'un nom de fichier indique qu'on prend en "
+      "concidération l'entrée standart.\n");
 }
 
 static int scptr_display(context *ctx, const char *ref) {

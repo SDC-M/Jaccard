@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
         goto dispose;
       }
       int c;
+      rewind(stdin);
       while ((c = fgetc(stdin)) != EOF) {
-        printf("%c", c);
         fputc(c, p);
       }
       rewind(p);
@@ -131,7 +131,6 @@ int main(int argc, char *argv[]) {
         r = hm__fscanf(p, value_max, x, want_punc);
       }
       fclose(p);
-      bst_repr_graphic(bst_f, put);
       tab[i - optind] = bst_f;
     } else {
       tab[i - optind] = file_to_bst(argv[i], words, value_max, want_punc);
