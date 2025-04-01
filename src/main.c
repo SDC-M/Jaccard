@@ -39,11 +39,6 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   return EOF;
 }
 
-
-void put(const void *p) {
-  printf("%s", (const char *)p);
-}
-
 //------------------------------------------------------------------------------
 
 int rfree(void *ptr) {
