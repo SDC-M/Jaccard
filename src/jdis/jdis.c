@@ -66,18 +66,35 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
 }
 
 bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
-  if (file_name == nullptr || words == nullptr) {
-    return nullptr;
-  }
-  FILE *p = fopen(file_name, "r");
-  if (p == nullptr) {
-    return nullptr;
+  FILE *p = nullptr;
+  bst *bst_f = nullptr;
+  if (strcmp(file_name, "-") == 0) {
+    printf("ici\n");
+    p = tmpfile();
+    if (p == nullptr) {
+      fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
+      return nullptr;
+    }
+    int c;
+    rewind(stdin);
+    while ((c = fgetc(stdin)) != EOF) {
+      fputc(c, p);
+    }
+    rewind(p);
+  } else {
+    if (file_name == nullptr || words == nullptr) {
+      return nullptr;
+    }
+    p = fopen(file_name, "r");
+    if (p == nullptr) {
+      return nullptr;
+    }
   }
   if (value_max == 0) {
     value_max = WORD_MAX_SIZE;
   }
   char x[value_max + 1];
-  bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
+  bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (bst_f == nullptr) {
     fclose(p);
     return nullptr;
@@ -92,7 +109,7 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
       bst_dispose(&bst_f);
       return nullptr;
     }
-    if (res == z){
+    if (res == z) {
       holdall_put(words, z);
     } else {
       free(z);
@@ -102,4 +119,3 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
   fclose(p);
   return bst_f;
 }
-

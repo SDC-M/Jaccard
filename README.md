@@ -12,7 +12,7 @@ Project about Jaccard distance implements by AVL.
 
 ## Optionnel
 
-[O] - Gérer la prise en compte de l'entrée standart
+[X] - Gérer la prise en compte de l'entrée standart
 
 [O] - Proposer une implémentation du holdall avec tableau dynamique à gestion
       préfixielle.
