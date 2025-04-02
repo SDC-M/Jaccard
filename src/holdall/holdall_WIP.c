@@ -3,12 +3,16 @@
 #include "holdall.h"
 #include <stdio.h>
 
-#define CAPACITY 2
+#define CAPACITY_MIN 2
 #define CAPACITY_MUL 2
+
+#define VALUE_ALREADY_EXIST 1
+#define LACK_OF_MEMORY -1
 
 struct holdall {
   const void **aref;
-  size_t count;
+  size_t cap;
+  size_t card;
 };
 
 holdall *holdall_empty() {
@@ -17,39 +21,48 @@ holdall *holdall_empty() {
     return nullptr;
   }
   ha->aref = malloc(CAPACITY * sizeof(*(ha->aref)));
-  if (ha->aref == nullptr){
+  if (ha->aref == nullptr) {
     free(ha);
     return nullptr;
   }
-  ha->count = 0;
+  ha->cap = CAPACITY_MIN;
+  ha->card = 0;
   return ha;
 }
 
 void holdall_dispose(holdall **haptr) {
+  if (*haptr == nullptr) {
+    return;
+  }
+  for (size_t i = 0; i < (*haptr)->card; i += 1) {
+    free((*haptr)->aref[i]);
+  }
+  free((*haptr)->aref);
   free(*haptr);
   *haptr = nullptr;
 }
 
 int holdall_put(holdall *ha, void *ref) {
-  choldall *p = malloc(sizeof *p);
-  if (p == nullptr) {
-    return -1;
+  if (ha->card == ha->cap) {
+    const void **new_array = realloc(ha->aref,
+          CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
+    if (new_array == nullptr){
+      return LACK_OF_MEMORY;
+    }
   }
-  p->ref = ref;
-#if defined HOLDALL_PUT_TAIL
-  p->next = nullptr;
-  *ha->tailptr = p;
-  ha->tailptr = &p->next;
-#else
-  p->next = ha->head;
-  ha->head = p;
-#endif
-  ha->count += 1;
+  for (size_t i = 0; i < ha->card; ++i) {
+    const void *val = ha->aref[i];
+    if (val == ref) {
+      return VALUE_ALREADY_EXIST;
+    }
+  }
+  ha->aref[ha->card] = ref;
+  ha->card += 1;
   return 0;
 }
 
-size_t holdall_count(holdall *ha) {
-  return ha->count;
+size_t holdall_card(holdall *ha) {
+  return ha->card;
 }
 
 int holdall_apply(holdall *ha,
@@ -171,7 +184,7 @@ extern void holdall_sort(holdall *ha,
   if (ha->head == nullptr) {
     return;
   }
-  holdall_sort_aux(ha->head, ha->count, compar);
+  holdall_sort_aux(ha->head, ha->card, compar);
 }
 
 #endif
