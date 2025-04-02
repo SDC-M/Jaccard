@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
       printf("\t%s", argv[i + optind]);
     }
     printf("\n");
-    bst_repr_graphic(uni, (void (*)(const void *))put);
+    //bst_repr_graphic(uni, (void (*)(const void *))put);
     graph_belonging(tab, uni, argc - optind);
     bst_dispose(&uni);
   }

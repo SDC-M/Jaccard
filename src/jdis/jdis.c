@@ -113,9 +113,9 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
       return nullptr;
     }
     if (res == z) {
-      printf("%s\n", z);
+
       holdall_put(words, z);
-      printf("%zu\n", holdall_count(words));
+
     }else{
       free(z);
     }
