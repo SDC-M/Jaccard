@@ -26,15 +26,6 @@ holdall *holdall_empty() {
 }
 
 void holdall_dispose(holdall **haptr) {
-  if (*haptr == nullptr) {
-    return;
-  }
-  choldall *p = (*haptr)->head;
-  while (p != nullptr) {
-    choldall *t = p;
-    p = p->next;
-    free(t);
-  }
   free(*haptr);
   *haptr = nullptr;
 }
