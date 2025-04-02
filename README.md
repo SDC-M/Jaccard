@@ -21,4 +21,6 @@ Project about Jaccard distance implements by AVL.
 [O] - Retravailler rapidement le bst_ip.h pour changer les complexités
     de size/height/distance
 
-[O] -
+## Test
+
+./jdis ../Algo3TP/textes/lesmiserables.txt ../Algo3TP/textes/domjuan.txt ../Algo3TP/textes/abeeeillmrsss.txt ../Algo3TP/textes/fr_.txt ../Algo3TP/textes/tartuffe.txt
