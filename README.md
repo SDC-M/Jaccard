@@ -16,3 +16,9 @@ Project about Jaccard distance implements by AVL.
 
 [O] - Proposer une implémentation du holdall avec tableau dynamique à gestion
       préfixielle.
+## Clean UP
+
+[O] - Retravailler rapidement le bst_ip.h pour changer les complexités
+    de size/height/distance
+
+[O] -
