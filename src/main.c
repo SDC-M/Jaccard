@@ -15,6 +15,10 @@ int rfree(void *ptr) {
   return 0;
 }
 
+void put(const char *ref){
+  printf("%s", ref);
+}
+
 // add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
 // dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
 // une valeur différente de nulle sinon
@@ -94,6 +98,7 @@ int main(int argc, char *argv[]) {
       printf("\t%s", argv[i + optind]);
     }
     printf("\n");
+    bst_repr_graphic(uni, (void (*)(const void *))put);
     graph_belonging(tab, uni, argc - optind);
     bst_dispose(&uni);
   }
@@ -102,7 +107,7 @@ dispose:
     bst_dispose(&tab[i]);
   }
 dispose2:
-  holdall_apply(words, rfree);
+
   holdall_dispose(&words);
   free(tab);
   return EXIT_SUCCESS;

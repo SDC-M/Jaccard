@@ -8,21 +8,21 @@ struct context {
   int nb_bst;
 };
 
-void help(const char *args) {
-  switch (args) {
-    case "g":
-      _
-      break;
-    case "i":
-      _
-      break;
-    case "":
-      _
-      break;
-    case "g":
-      _
-      break;
-    default:
+void help(void) {
+  //switch (args) {
+    //case "g":
+      //_
+      //break;
+    //case "i":
+      //_
+      //break;
+    //case "":
+      //_
+      //break;
+    //case "g":
+      //_
+      //break;
+    //default:
       fprintf(stdout,
           "Liste des opérations réalisables :\n\n");
       fprintf(stdout, " -? : Affiche ce menu d'aide.\n");
@@ -41,8 +41,8 @@ void help(const char *args) {
       fprintf(stdout,
           " - : À la place d'un nom de fichier indique qu'on prend en "
           "concidération l'entrée standart.\n");
-  }
 }
+
 
 static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
