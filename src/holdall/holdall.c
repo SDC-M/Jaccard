@@ -6,11 +6,8 @@
 #define CAPACITY_MIN 2
 #define CAPACITY_MUL 2
 
-#define VALUE_ALREADY_EXIST 1
-#define LACK_OF_MEMORY -1
-
 struct holdall {
-  char **aref;
+  const void **aref;
   size_t cap;
   size_t count;
 };
@@ -20,7 +17,7 @@ holdall *holdall_empty() {
   if (ha == nullptr) {
     return nullptr;
   }
-  ha->aref = malloc(CAPACITY_MIN * sizeof(*(ha->aref)));
+  ha->aref = malloc(CAPACITY_MIN * sizeof(const void *));
   if (ha->aref == nullptr) {
     free(ha);
     return nullptr;
@@ -42,20 +39,27 @@ void holdall_dispose(holdall **haptr) {
   *haptr = nullptr;
 }
 
-int holdall_put(holdall *ha, void *ref) {
+// double_capacity : Renvoie le fourre-tout avec la capacité de son tableau
+// dynamique doublée. Renvoie un pointeur nul en cas d'échec
+static void *double_capacity(holdall *ha) {
+  const void **new_array = realloc(ha->aref,
+        CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
+  if (new_array == nullptr) {
+    return -1;
+  }
+  ha->cap *= CAPACITY_MUL;
+  ha->aref = new_array;
+  return ha;
+}
+
+int holdall_put(holdall *ha, const void *ref) {
   if (ha->count == ha->cap) {
-    char **new_array = realloc(ha->aref,
-          CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
-    if (new_array == nullptr){
-      return LACK_OF_MEMORY;
-    }
-    ha->cap *= CAPACITY_MUL;
-    ha->aref = new_array;
+    double_capacity(ha);
   }
   for (size_t i = 0; i < ha->count; ++i) {
-    char *val = ha->aref[i];
+    void *val = ha->aref[i];
     if (val == ref) {
-      return VALUE_ALREADY_EXIST;
+      return 1;
     }
   }
   ha->aref[ha->count] = ref;
@@ -104,12 +108,11 @@ int holdall_apply_context2(holdall *ha,
 
 #if defined HOLDALL_WANT_EXT && HOLDALL_WANT_EXT != 0
 
-static void swap(const void **aref, size_t i, size_t j){
+static void swap(const void **aref, size_t i, size_t j) {
   const void *tmp = aref[i];
   aref[i] = aref[j];
   aref[j] = tmp;
 }
-
 
 //  heapsort_down : il est supposé que base est l'adresse du premier composant
 //    d'un tableau de longueur nmemb et de taille de composants size, que
@@ -119,19 +122,19 @@ static void swap(const void **aref, size_t i, size_t j){
 //    faire du tableau un maximier sur [ k ... nmemb - 1 ].
 
 static void heapsort_down(char *base, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *), size_t k){
+    int (*compar)(const void *, const void *), size_t k) {
   size_t i = k;
-  while (true){
+  while (true) {
     size_t max = i;
     size_t left = 2 * i + 1;
     size_t right = 2 * i + 2;
-    if (left < nmemb && compar(base + left * size, base + max * size) > 0){
+    if (left < nmemb && compar(base + left * size, base + max * size) > 0) {
       max = left;
     }
-    if (right < nmemb && compar(base + right * size, base + max * size) > 0){
+    if (right < nmemb && compar(base + right * size, base + max * size) > 0) {
       max = right;
     }
-    if (max == i){
+    if (max == i) {
       break;
     }
     mem_swap(base + i * size, base + max * size, size);
@@ -140,15 +143,15 @@ static void heapsort_down(char *base, size_t nmemb, size_t size,
 }
 
 void holdall_sort(holdall *ha
-    int (*compar)(const void *, const void *)){
-
-  for (size_t k = 0 ; k < ha->count; k += 1){
+    int (*compar)(const void *, const void *)) {
+  for (size_t k = 0 ; k < ha->count; k += 1) {
     size_t icur = ((nmemb / 2) - k - 1);
-    heapsort_down((char *)base, nmemb, size, compar, icur);
+    heapsort_down((char *) base, nmemb, size, compar, icur);
   }
-  for (size_t nb = ha->count; nb > 0; --nb){
+  for (size_t nb = ha->count; nb > 0; --nb) {
     swap(ha->aref, nb, 0);
     heapsort_down(ha->aref, ha->count, 1, compar, 0);
   }
 }
+
 #endif
