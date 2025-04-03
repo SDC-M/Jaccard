@@ -7,7 +7,7 @@
 #define CAPACITY_MUL 2
 
 struct holdall {
-  const void **aref;
+  void **aref;
   size_t cap;
   size_t count;
 };
@@ -42,17 +42,17 @@ void holdall_dispose(holdall **haptr) {
 // double_capacity : Renvoie le fourre-tout avec la capacité de son tableau
 // dynamique doublée. Renvoie un pointeur nul en cas d'échec
 static void *double_capacity(holdall *ha) {
-  const void **new_array = realloc(ha->aref,
+  void **new_array = realloc(ha->aref,
         CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
   if (new_array == nullptr) {
-    return -1;
+    return nullptr;
   }
   ha->cap *= CAPACITY_MUL;
   ha->aref = new_array;
   return ha;
 }
 
-int holdall_put(holdall *ha, const void *ref) {
+int holdall_put(holdall *ha, void *ref) {
   if (ha->count == ha->cap) {
     double_capacity(ha);
   }
