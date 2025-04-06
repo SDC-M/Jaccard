@@ -10,6 +10,8 @@ struct context{
 
 void help(void) {
   fprintf(stdout,
+      "Utilisation : ./jdis [OPTIONS]... FICHIER1 FICHIER2 ...\n\n");
+  fprintf(stdout,
       "Liste des opérations réalisables :\n\n");
   fprintf(stdout, " -? : Affiche ce menu d'aide.\n");
   fprintf(stdout,

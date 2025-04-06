@@ -1,0 +1,108 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[hypertexnames=false, colorlinks=true, linkcolor=black]{hyperref}
+\usepackage{listings}
+\usepackage{xcolor} 
+
+\usetikzlibrary{backgrounds, shapes.geometric, positioning}
+
+\geometry{a4paper, left=15mm, right=15mm, top=30mm, bottom=30mm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Distance de Jaccard}
+\fancyhead[R]{Projet Algorithmie 3}
+\fancyfoot[C]{\thepage}
+
+\newcommand{\fondpremierepage}{
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[align=center, text width=0.8\textwidth, font=\huge\bfseries] at (current page.center) {
+        Projet Algorithmie 3 La distance de Jaccard}; 
+    \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
+        De - backer Cuvelier Sébastien Llobregat Nicolas}; 
+    \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
+        Version du 06 Avril 2025}; 
+  \end{tikzpicture}
+}
+
+\lstdefinestyle{Cstyle}{
+  language=C,
+  basicstyle=\ttfamily\normalsize,       % Style de police (monospace) et taille
+  numbers=left,                     % Affichage des numéros de ligne à gauche
+  numberstyle=\tiny\color{black},     % Style des numéros de ligne
+  stepnumber=1,                     % Numéroter chaque ligne
+  numbersep=10pt,                    % Distance entre les numéros et le code
+  backgroundcolor=\color{gray!20},     % Fond blanc pour le code
+  showspaces=false,                  % Ne pas afficher les espaces
+  showstringspaces=true,            % Ne pas afficher les espaces dans les chaînes
+  showtabs=false,                    % Ne pas afficher les tabulations
+  frame=single,                      % Encadrer le code
+  rulecolor=\color{black},           % Couleur de la bordure
+  tabsize=2,                         % Taille des tabulations
+  captionpos=b,                      % Position de la légende (en bas)
+  breaklines=true,                   % Sauter les lignes trop longues
+  breakatwhitespace=true,            % Casser à l'espace pour les lignes longues
+  morekeywords={long, int, double, return, if, else, while, for, void, switch},  % Ajouter des mots-clés à la coloration
+  keywordstyle=\color{brown}\bfseries,  % Colorier les mots-clés en bleu et en gras
+  commentstyle=\color{gray},         % Colorier les commentaires en vert
+  stringstyle=\color{purple}            % Colorier les chaînes en rouge
+}
+
+\begin{document}
+
+\fondpremierepage{}
+\thispagestyle{empty}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Arbre exemple}
+
+\begin{center}
+    \begin{tikzpicture}[
+      sibling distance=70mm,
+      level distance=20mm,
+      every node/.style={draw, fill=gray!20, circle},
+      edge from parent/.style={draw, thick},
+      level 1/.style={sibling distance=80mm},
+      level 2/.style={sibling distance=40mm},
+      level 3/.style={sibling distance=20mm}
+    ]
+      \node {iii}
+        child { node {ee}
+            child { node {a} }
+            child { node {oooo} }
+        }
+        child { node {uuuuu}
+            child { node {uuu}
+            child { node {o} }
+            child { node {uuuu} }
+        }
+            child { node {yyyyyy} }
+        };
+    \end{tikzpicture}
+    \end{center}
+
+\newpage
+
+\section{Exemple de code}
+
+\begin{lstlisting}[style=Cstyle]
+#include <stdio.h>
+
+// Voici la fonction main.
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section{}
+
+\end{document}

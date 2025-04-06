@@ -1,3 +1,9 @@
 jdis
 jdis_test
 .#makefile#
+textes/
+rendu/contre-rendu.aux
+rendu/contre-rendu.log
+rendu/contre-rendu.out
+rendu/contre-rendu.toc
+rendu/contre-rendu.synctex.gz

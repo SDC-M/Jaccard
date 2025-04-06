@@ -1,12 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "jdis.h"
 
 #define WORD_MAX_SIZE 50
-
-#define PUNC_SEPARATORS "“`‘\'\"-_)(;,!?:.'\n "
-#define CLASSIC_SEPARATORS "\n "
 
 struct ctx {
   bst *apply_set;
@@ -51,11 +49,17 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   int c;
   char *p = buffer;
   int cptr = 0;
-  const char *punc = wp == true ? PUNC_SEPARATORS : CLASSIC_SEPARATORS;
   while ((c = fgetc(stream)) != EOF) {
-    if (strchr(punc, c) != nullptr || cptr >= value_max) {
-      *p = '\0';
-      return 0;
+    if (wp){
+      if (ispunct(c) || isspace(c) || cptr >= value_max) {
+        *p = '\0';
+        return 0;
+      }
+    } else {
+      if (isspace(c) || cptr >= value_max) {
+        *p = '\0';
+        return 0;
+      }
     }
     *p = (char) c;
     ++p;
@@ -69,7 +73,6 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
   FILE *p = nullptr;
   bst *bst_f = nullptr;
   if (strcmp(file_name, "-") == 0) {
-    printf("ici\n");
     p = tmpfile();
     if (p == nullptr) {
       fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
@@ -82,7 +85,6 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
     }
     rewind(p);
   } else {
-    printf("ici %s\n", file_name);
     if (file_name == nullptr || words == nullptr) {
       return nullptr;
     }
