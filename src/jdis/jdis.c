@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <ctype.h>
 #include "jdis.h"
 
 #define WORD_MAX_SIZE 50
