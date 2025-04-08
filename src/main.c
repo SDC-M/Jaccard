@@ -29,7 +29,19 @@ int main(int argc, char *argv[]) {
   int escaped_file = 0;
   int value_max = 0;
   bool want_punc = false;
-  while ((option = getopt(argc, argv, "?pg-:i:")) != -1) {
+  int option_index;
+  static struct option long_options[] = {
+    { "graph", no_argument, 0, 'g' },
+    { "", required_argument, 0, 0 }, // prend un argument et c'est l'argument
+                                     // qui suit et donc plus qu'a faire file to
+                                     // bst dessus
+    { "initial", required_argument, 0, 'i' },
+    { "help", no_argument, 0, '?' },
+    { "punctuation-like-space", no_argument, 0, 'p' },
+    { 0, 0, 0, 0 }
+  };
+  while ((option = getopt_long(argc, argv, "?pg-:i:", long_options,
+        &option_index)) != -1) {
     switch (option) {
       case '?':
         help();
@@ -57,7 +69,7 @@ int main(int argc, char *argv[]) {
   holdall *words = holdall_empty();
   bst **tab = malloc((size_t) (argc - optind + escaped_file) * sizeof(bst *));
   for (int i = optind - escaped_file; i < argc; ++i) {
-    if (strcmp(argv[i], "--") == 0){
+    if (strcmp(argv[i], "--") == 0) {
       help();
       goto dispose2;
     }
