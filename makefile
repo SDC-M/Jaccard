@@ -25,7 +25,7 @@ $(makefile_indicator): makefile
 	@$(RM) $(objects) $(executable)
 
 archive:
-	tar --exclude='.git' --exclude='.gitignore' --exclude='./.#makefile#' \
+	tar --exclude='jdis' --exclude='.git' --exclude='.gitignore' --exclude='./.#makefile#' \
 	          --exclude='./rendu/contre-rendu.aux' --exclude='./rendu/contre-rendu.log' \
 	          --exclude='./rendu/contre-rendu.out' --exclude='./rendu/contre-rendu.synctex.gz' \
 	          --exclude='./rendu/contre-rendu.tex' --exclude='./rendu/contre-rendu.toc' -czvf ../projet.tar.gz .
