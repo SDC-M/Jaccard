@@ -53,20 +53,21 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   int cptr = 0;
   while ((c = fgetc(stream)) != EOF) {
     if (wp && ispunct(c)) {
-      *p = '\0';
-      return 0;
+      break;
     }
     if (isspace(c) || cptr >= value_max) {
-      *p = '\0';
-      return 0;
+      break;
     }
     *p = (char) c;
     ++p;
     ++cptr;
   }
-  *p = '\0';
+  if (cptr > 0){
+    *p = '\0';
+  }
   return c == EOF ? EOF : 0;
 }
+
 
 // stdin__to_file : En cas de succès renvoie une tête de lecture vers un fichier
 //  temporaire en mode lecture seule, en cas d'échec renvoie nullptr.

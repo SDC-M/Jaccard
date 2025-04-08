@@ -6,6 +6,7 @@
 \usepackage[hypertexnames=false, colorlinks=true, linkcolor=black]{hyperref}
 \usepackage{listings}
 \usepackage{xcolor} 
+\usepackage{tocloft} 
 
 \usetikzlibrary{backgrounds, shapes.geometric, positioning}
 
@@ -17,6 +18,12 @@
 \fancyhead[R]{Projet Algorithmie 3}
 \fancyfoot[C]{\thepage}
 
+\renewcommand{\contentsname}{Table des matières}
+
+\setlength{\cftbeforesecskip}{20pt}
+\setlength{\cftbeforesubsecskip}{11pt}
+\setlength{\cftbeforesubsubsecskip}{8pt} 
+
 \newcommand{\fondpremierepage}{
   \begin{tikzpicture}[remember picture, overlay]
     \node[align=center, text width=0.8\textwidth, font=\huge\bfseries] at (current page.center) {
@@ -24,7 +31,7 @@
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De - backer Cuvelier Sébastien Llobregat Nicolas}; 
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 06 Avril 2025}; 
+        Version du 08 Avril 2025}; 
   \end{tikzpicture}
 }
 
@@ -59,6 +66,46 @@
 \newpage
 \tableofcontents
 \newpage
+
+\section{Organisation du travail}
+
+\subsection{Répartition du travail}
+
+\subsection{Outils utilisés}
+
+\section{Structure du projet}
+
+\subsection{Gestion des options}
+
+\subsection{Gestion de l'entrée standart}
+
+\section{Choix d'implémentation}
+
+\subsection{Stockage des mots avec holdall}
+
+\subsubsection{Implémentation par LDSC}
+
+\subsubsection{Implémentation par tableaux dynamiques}
+
+\subsection{Module op}
+
+\section{Calcul de la distance de Jaccard}
+
+\subsection{Module jdis}
+
+\section{Les difficultés rencontrées}
+
+\subsection{Tentative d'utilisation de getopt}
+
+\subsection{La fonction fscanf}
+
+\section{Performances}
+
+\subsection{Compléxité en espace}
+
+\subsection{Compléxité en temps}
+
+\section{Améliorations possibles}
 
 \section{Arbre exemple}
 
@@ -102,7 +149,5 @@ int main() {
 \end{lstlisting}
 
 \newpage
-
-\section{}
 
 \end{document}
