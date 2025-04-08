@@ -18,13 +18,6 @@ int rfree(void *ptr) {
   return 0;
 }
 
-// add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
-// dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
-// une valeur différente de nulle sinon
-int add_element(bst *t, const void *ref) {
-  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
-}
-
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
   bool graph = false;
