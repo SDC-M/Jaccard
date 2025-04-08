@@ -10,8 +10,8 @@
 #include "jdis/jdis.h"
 #include "op/op.h"
 
-#define LONG_OPT_INITIAL 10
-#define SHORT_OPT_INITIAL 2
+#define LEN_LONG_OPT_INITIAL 10
+#define LEN_SHORT_OPT_INITIAL 2
 
 int rfree(void *ptr) {
   free(ptr);
@@ -40,16 +40,17 @@ int main(int argc, char *argv[]) {
   for (int i = 1; i < argc; ++i) {
     if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
       help();
-    } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i],
-          "--punctuation-like-space") == 0) {
+      continue;
+    } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--punctuation-like-space") == 0) {
+      printf("error\n");
       want_punc = true;
-    } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i],
-          "--graph") == 0) {
+    } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i],"--graph") == 0) {
       graph = true;
-    } else if (strstr(argv[i], "-i") != nullptr ) {
-      value_max = atoi(argv[i] + SHORT_OPT_INITIAL);
+    } else if (strstr(argv[i], "-i") != nullptr) {
+      value_max = atoi(argv[i] + LEN_SHORT_OPT_INITIAL);
     } else if (strstr(argv[i], "--initial=") != nullptr) {
-      value_max = atoi(argv[i] + LONG_OPT_INITIAL);
+      printf("long long very long option\n");
+      value_max = atoi(argv[i] + LEN_LONG_OPT_INITIAL);
     } else if (strcmp(argv[i], "--") == 0) {
       escaped_file = true;
       continue;
@@ -94,7 +95,7 @@ int main(int argc, char *argv[]) {
           (int (*)(void *, const void *)) add_element, nullptr, nullptr);
     }
     for (int i = 0; i < nb_files; ++i) {
-      printf("\t%s", argv[i]);
+      printf("\t%s", filenames[i]);
     }
     printf("\n");
     graph_belonging(tab, uni, nb_files);
@@ -108,5 +109,6 @@ dispose:
   holdall_apply(words, rfree);
   holdall_dispose(&words);
   free(tab);
+  free(filenames);
   return EXIT_SUCCESS;
 }
