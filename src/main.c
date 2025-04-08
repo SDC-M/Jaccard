@@ -10,6 +10,9 @@
 #include "jdis/jdis.h"
 #include "op/op.h"
 
+#define LONG_OPT_INITIAL 10
+#define SHORT_OPT_INITIAL 2
+
 int rfree(void *ptr) {
   free(ptr);
   return 0;
@@ -24,72 +27,60 @@ int add_element(bst *t, const void *ref) {
 
 int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
-  int option;
   bool graph = false;
-  int escaped_file = 0;
+  bool escaped_file = false;
   int value_max = 0;
   bool want_punc = false;
-  int option_index;
-  static struct option long_options[] = {
-    { "graph", no_argument, 0, 'g' },
-    { "", required_argument, 0, 0 }, // prend un argument et c'est l'argument
-                                     // qui suit et donc plus qu'a faire file to
-                                     // bst dessus
-    { "initial", required_argument, 0, 'i' },
-    { "help", no_argument, 0, '?' },
-    { "punctuation-like-space", no_argument, 0, 'p' },
-    { 0, 0, 0, 0 }
-  };
-  while ((option = getopt_long(argc, argv, "?pg-:i:", long_options,
-        &option_index)) != -1) {
-    switch (option) {
-      case '?':
-        help();
-        return EXIT_SUCCESS;
-      case 'p':
-        want_punc = true;
-        break;
-      case '-':
-        escaped_file += 1;
-        break;
-      case 'i':
-        value_max = atoi(optarg);
-        break;
-      case 'g':
-        graph = true;
-        break;
-      default:
-        return EXIT_FAILURE;
-    }
-  }
-  if (argc - optind + escaped_file < 2) {
-    fprintf(stderr, "Pas assez d'arguments.\n");
+  int nb_files = 0;
+  char **filenames = malloc((size_t) argc * sizeof(char *));
+  if (filenames == nullptr) {
+    printf("***Erreur d'allocation du tableau des nom de fichiers\n");
     return EXIT_FAILURE;
   }
-  holdall *words = holdall_empty();
-  bst **tab = malloc((size_t) (argc - optind + escaped_file) * sizeof(bst *));
-  for (int i = optind - escaped_file; i < argc; ++i) {
-    if (strcmp(argv[i], "--") == 0) {
+  for (int i = 1; i < argc; ++i) {
+    if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
       help();
-      goto dispose2;
+    } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i],
+          "--punctuation-like-space") == 0) {
+      want_punc = true;
+    } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i],
+          "--graph") == 0) {
+      graph = true;
+    } else if (strstr(argv[i], "-i") != nullptr ) {
+      value_max = atoi(argv[i] + SHORT_OPT_INITIAL);
+    } else if (strstr(argv[i], "--initial=") != nullptr) {
+      value_max = atoi(argv[i] + LONG_OPT_INITIAL);
+    } else if (strcmp(argv[i], "--") == 0) {
+      escaped_file = true;
+      continue;
+    } else if (escaped_file){
+      filenames[nb_files] = argv[i];
+      escaped_file = false;
+      ++nb_files;
+    }else{
+      filenames[nb_files] = argv[i];
+      ++nb_files;
     }
-    tab[i - optind] = file_to_bst(argv[i], words, value_max, want_punc);
-    if (tab[i - optind] == nullptr) {
+  }
+  holdall *words = holdall_empty();
+  bst **tab = malloc((size_t) (nb_files) * sizeof(bst *));
+  for (int i = 0; i < nb_files; ++i) {
+    tab[i] = file_to_bst(filenames[i], words, value_max, want_punc);
+    if (tab[i] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
-          argv[i]);
-      for (int j = optind; j < i; ++j) {
-        bst_dispose(&tab[j - optind]);
+          filenames[i]);
+      for (int j = 0; j < i; ++j) {
+        bst_dispose(&tab[j]);
       }
       free(tab);
       return EXIT_FAILURE;
     }
   }
-  for (int i = 0; i < argc - optind - 1; ++i) {
-    for (int j = i + 1; j < argc - optind; ++j) {
+  for (int i = 0; i < nb_files - 1; ++i) {
+    for (int j = i + 1; j < nb_files; ++j) {
       size_t card_in = card_intersection(tab[i], tab[j]);
       double jaccard_distance = jdis(tab[i], tab[j], card_in);
-      printf("%s\t%s: %.4lf\n", argv[i + optind], argv[j + optind],
-          jaccard_distance);
+      printf("%s\t%s: %.4lf\n", filenames[i], filenames[j], jaccard_distance);
     }
   }
   if (graph) {
@@ -98,22 +89,22 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "Erreur d'allocation sur l'union\n");
       goto dispose;
     }
-    for (int i = 0; i < argc - optind; ++i) {
+    for (int i = 0; i < nb_files; ++i) {
       bst_dft_infix_apply_context(tab[i], 0, uni,
           (int (*)(void *, const void *)) add_element, nullptr, nullptr);
     }
-    for (int i = 0; i < argc - optind; ++i) {
-      printf("\t%s", argv[i + optind]);
+    for (int i = 0; i < nb_files; ++i) {
+      printf("\t%s", argv[i]);
     }
     printf("\n");
-    graph_belonging(tab, uni, argc - optind);
+    graph_belonging(tab, uni, nb_files);
     bst_dispose(&uni);
   }
 dispose:
-  for (int i = 0; i < argc - optind; ++i) {
+  for (int i = 0; i < nb_files; ++i) {
     bst_dispose(&tab[i]);
   }
-dispose2:
+  //dispose2:
   holdall_apply(words, rfree);
   holdall_dispose(&words);
   free(tab);
