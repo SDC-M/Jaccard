@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   int nb_files = 0;
   char **filenames = malloc((size_t) argc * sizeof(char *));
   if (filenames == nullptr) {
-    printf("***Erreur d'allocation du tableau des nom de fichiers\n");
+    printf("*** Erreur d'allocation du tableau des noms de fichiers\n");
     return EXIT_FAILURE;
   }
   for (int i = 1; i < argc; ++i) {
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
   if (graph) {
     bst *uni = bst_empty((int (*)(const void *, const void *)) strcoll);
     if (uni == nullptr) {
-      fprintf(stderr, "Erreur d'allocation sur l'union\n");
+      fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
       goto dispose;
     }
     for (int i = 0; i < nb_files; ++i) {
@@ -95,7 +95,6 @@ dispose:
   for (int i = 0; i < nb_files; ++i) {
     bst_dispose(&tab[i]);
   }
-  //dispose2:
   holdall_apply(words, rfree);
   holdall_dispose(&words);
   free(tab);

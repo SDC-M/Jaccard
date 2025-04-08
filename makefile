@@ -1,38 +1,33 @@
 CC = gcc
 CFLAGS = -std=c2x \
   -Wall -Wconversion -Werror -Wextra -Wpedantic -Wwrite-strings \
-  -O0 -g3
+  -O2
 src = $(shell find ./src/ -name '*.c')
 executable = jdis
 
-src_test = tests/main.c tests/greatest/greatest.h $(shell find ./src/ -name '*.c' -not -name 'main.c')
-executable_test = $(executable)_test
 makefile_indicator = .\#makefile\#
+RM = rm -f
+objects = $(src:.c=.o)
 
-.PHONY: all clean test
+.PHONY: all clean test archive
 
 all: $(executable)
 
 clean:
 	$(RM) $(executable)
-	$(RM) $(executable_test)
-	$(RM) *.gcov *.gcno *.gcda
-	@$(RM) $(makefile_indicator)
-
-test: $(executable_test)
-	./$(executable_test)
-
+	@$(RM) $(makefile_indicator) $(objects)
 
 $(executable): $(src)
 	$(CC) $(CFLAGS) -o $(executable) $^
 
-
-$(executable_test): $(src_test)
-	$(CC) $(CFLAGS) -fprofile-arcs -ftest-coverage -o $(executable_test) -DTEST_MAIN $^
-
-include $(makefile_indicator)
-
 $(makefile_indicator): makefile
 	@touch $@
 	@$(RM) $(objects) $(executable)
+
+archive:
+	tar --exclude='.git' --exclude='.gitignore' --exclude='./.#makefile#' \
+	          --exclude='./rendu/contre-rendu.aux' --exclude='./rendu/contre-rendu.log' \
+	          --exclude='./rendu/contre-rendu.out' --exclude='./rendu/contre-rendu.synctex.gz' \
+	          --exclude='./rendu/contre-rendu.tex' --exclude='./rendu/contre-rendu.toc' -czvf ../projet.tar.gz .
+
 

@@ -74,7 +74,7 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
 static FILE* stdin__to_file () {
   FILE *p = tmpfile();
   if (p == nullptr) {
-    fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
+    fprintf(stderr, "*** Erreur lors de l'allocation pour l'entrée standart.");
     return nullptr;
   }
   int c;

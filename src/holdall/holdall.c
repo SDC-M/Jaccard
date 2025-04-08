@@ -104,7 +104,6 @@ int holdall_apply_context2(holdall *ha,
 
 #if defined HOLDALL_WANT_EXT && HOLDALL_WANT_EXT != 0
 
-#if 0
 static void swap(choldall *a, choldall *b) {
   void *temp = a->ref;
   a->ref = b->ref;
@@ -136,58 +135,4 @@ extern void holdall_sort(holdall *ha,
   }
 }
 
-#elif 1
-static choldall *merge(choldall *p, size_t P, choldall *q, size_t Q,
-    int (*compar)(const void *, const void *)) {
-  for (size_t i = 0; i < P + Q - 1; ++i) {
-    if (compar(p->next->ref, q->next->ref) > 0) {
-      choldall *t = q->next;
-      q->next = t->next;
-      t->next = p->next;
-      p->next = t;
-      if (Q == 1) {
-        break;
-      }
-      Q = Q - 1;
-    } else {
-      if (P == 1) {
-        while (Q >= 1) {
-          q = q->next;
-          Q = Q - 1;
-        }
-        break;
-      }
-      P = P - 1;
-    }
-    p = p->next;
-  }
-  return q;
-}
-
-static choldall *holdall_sort_aux(choldall *p, size_t n,
-    int (*compar)(const void *, const void *)) {
-  size_t Q = n / 2;
-  size_t P = n - Q;
-  choldall *q = nullptr;
-  if (P >= 2) {
-    q = holdall_sort_aux(p, P, compar);
-    if (Q >= 2) {
-      holdall_sort_aux(q, Q, compar);
-    }
-  } else {
-    q = p->next;
-  }
-  q = merge(p, P, q, Q, compar);
-  return q;
-}
-
-extern void holdall_sort(holdall *ha,
-    int (*compar)(const void *, const void *)) {
-  if (ha->head == nullptr) {
-    return;
-  }
-  holdall_sort_aux(ha->head, ha->count, compar);
-}
-
-#endif
 #endif
