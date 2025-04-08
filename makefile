@@ -9,7 +9,7 @@ makefile_indicator = .\#makefile\#
 RM = rm -f
 objects = $(src:.c=.o)
 
-.PHONY: all clean test archive
+.PHONY: all clean archive
 
 all: $(executable)
 
