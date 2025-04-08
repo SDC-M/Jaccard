@@ -26,7 +26,8 @@ extern double jdis(bst *p, bst *q, size_t card_interction);
 //  renvoie l'avl associé, en cas d'erreur retourne nullptr et désalloue toute
 //  zone mémoire précédemment allouée, si le nom de fichier ou le fourre-tout
 //  sont des pointeurs null, retourne nullptr.
-extern bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp);
+extern bst *file_to_bst(char *file_name, holdall *words, int value_max,
+    bool wp);
 
 // add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
 // dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie

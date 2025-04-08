@@ -45,52 +45,70 @@ double jdis(bst *p, bst *q, size_t card_interction) {
 
 // hm__fscanf : tente de lire dans le fichier pointé par stream au plus
 //  value_max caractères, stocke dans la zone pointée par buffer et si wp est à
-//  vrai alors gère la ponctuation comme séparateur.
+//  vrai alors gère la ponctuation comme séparateur, en cas de succès renvoie 0
+//  sinon EOF.
 static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   int c;
   char *p = buffer;
   int cptr = 0;
   while ((c = fgetc(stream)) != EOF) {
-    if (wp){
-      if (ispunct(c) || isspace(c) || cptr >= value_max) {
-        *p = '\0';
-        return 0;
-      }
-    } else {
-      if (isspace(c) || cptr >= value_max) {
-        *p = '\0';
-        return 0;
-      }
+    if (wp && ispunct(c)) {
+      *p = '\0';
+      return 0;
+    }
+    if (isspace(c) || cptr >= value_max) {
+      *p = '\0';
+      return 0;
     }
     *p = (char) c;
     ++p;
     ++cptr;
   }
   *p = '\0';
-  return EOF;
+  return c == EOF ? EOF : 0;
+}
+
+// stdin__to_file : En cas de succès renvoie une tête de lecture vers un fichier
+//  temporaire en mode lecture seule, en cas d'échec renvoie nullptr.
+static FILE* stdin__to_file () {
+  FILE *p = tmpfile();
+  if (p == nullptr) {
+    fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
+    return nullptr;
+  }
+  int c;
+  rewind(stdin);
+  while ((c = fgetc(stdin)) != EOF) {
+    fputc(c, p);
+  }
+  rewind(p);
+  return p;
+}
+
+// create__file : En cas de succès renvoie une tête de lecture du fichier ouvert
+//  en mode lecture seule de nom file_name, en cas d'échec renvoie nullptr.
+static FILE* create__file (char *file_name) {
+  if (file_name == nullptr) {
+      return nullptr;
+  }
+  FILE *p = fopen(file_name, "r");
+  if (p == nullptr) {
+      return nullptr;
+  }
+  return p;
 }
 
 bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
+  if (words == nullptr) {
+    return nullptr;
+  }
   FILE *p = nullptr;
-  bst *bst_f = nullptr;
   if (strcmp(file_name, "-") == 0) {
-    p = tmpfile();
-    if (p == nullptr) {
-      fprintf(stderr, "Erreur lors de l'allocation pour l'entrée standart.");
+    if ((p = stdin__to_file()) == nullptr){
       return nullptr;
     }
-    int c;
-    rewind(stdin);
-    while ((c = fgetc(stdin)) != EOF) {
-      fputc(c, p);
-    }
-    rewind(p);
-  } else {
-    if (file_name == nullptr || words == nullptr) {
-      return nullptr;
-    }
-    p = fopen(file_name, "r");
-    if (p == nullptr) {
+   } else {
+    if ((p = create__file(file_name)) == nullptr){
       return nullptr;
     }
   }
@@ -98,7 +116,7 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
     value_max = WORD_MAX_SIZE;
   }
   char x[value_max + 1];
-  bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
+  bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (bst_f == nullptr) {
     fclose(p);
     return nullptr;
@@ -124,9 +142,6 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
   return bst_f;
 }
 
-// add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
-// dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
-// une valeur différente de nulle sinon
 int add_element(bst *t, const void *ref) {
   return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
 }

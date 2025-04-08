@@ -3,7 +3,7 @@
 
 #include "op.h"
 
-struct context{
+struct context {
   bst **t;
   int nb_bst;
 };
@@ -30,7 +30,7 @@ void help(void) {
 
 static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
-  for (int i = 0; i < ctx->nb_bst; ++i){
+  for (int i = 0; i < ctx->nb_bst; ++i) {
     if (bst_search(ctx->t[i], ref) != nullptr) {
       printf("x\t");
     } else {
@@ -43,14 +43,14 @@ static int scptr_display(context *ctx, const char *ref) {
 
 int graph_belonging(bst **t, bst *uni, int nb_file) {
   context *ctx = malloc(sizeof *ctx);
-  if (ctx == nullptr){
+  if (ctx == nullptr) {
     return -1;
   }
   ctx->nb_bst = nb_file;
   ctx->t = t;
   bst_dft_infix_apply_context(uni, 1, ctx,
-  (int (*)(void *, const void *)) scptr_display, nullptr,
-  nullptr);
+      (int (*)(void *, const void *)) scptr_display, nullptr,
+      nullptr);
   free(ctx);
   return 0;
 }
