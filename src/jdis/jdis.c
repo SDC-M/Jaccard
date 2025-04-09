@@ -55,8 +55,11 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
     if (wp && ispunct(c)) {
       break;
     }
-    if (isspace(c) || cptr >= value_max) {
+    if (isspace(c)) {
       break;
+    }
+    if (cptr >= value_max) {
+      continue;
     }
     *p = (char) c;
     ++p;

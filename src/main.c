@@ -67,13 +67,6 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
   }
-  for (int i = 0; i < nb_files - 1; ++i) {
-    for (int j = i + 1; j < nb_files; ++j) {
-      size_t card_in = card_intersection(tab[i], tab[j]);
-      double jaccard_distance = jdis(tab[i], tab[j], card_in);
-      printf("%s\t%s: %.4lf\n", filenames[i], filenames[j], jaccard_distance);
-    }
-  }
   if (graph) {
     bst *uni = bst_empty((int (*)(const void *, const void *)) strcoll);
     if (uni == nullptr) {
@@ -90,6 +83,14 @@ int main(int argc, char *argv[]) {
     printf("\n");
     graph_belonging(tab, uni, nb_files);
     bst_dispose(&uni);
+  } else {
+    for (int i = 0; i < nb_files - 1; ++i) {
+      for (int j = i + 1; j < nb_files; ++j) {
+        size_t card_in = card_intersection(tab[i], tab[j]);
+        double jaccard_distance = jdis(tab[i], tab[j], card_in);
+        printf("%s\t%s: %.4lf\n", filenames[i], filenames[j], jaccard_distance);
+      }
+    }
   }
 dispose:
   for (int i = 0; i < nb_files; ++i) {

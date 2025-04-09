@@ -147,7 +147,7 @@ graph d'appartenance des mots.
 
 \subsection{Gestion des options}
 
-\subsection{Gestions des fichiers}
+\subsection{Gestions des fichiers}\label{subsec:files}
 Pour gerer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
 associé en mode lecture seule puis nous lisons (précisions \textbf{\ref{subsec:fscanf}}) chaque
 mot et nous tentons de l'ajouter à l'arbre binaire associé. À la fin de la lecture nous avons
@@ -364,10 +364,34 @@ la distance de Jaccard entre les deux ensembles de mots de la paire de fichiers.
 \section{Les difficultés rencontrées}
 
 \subsection{Tentative d'utilisation de getopt}
+\paragraph{La bibliothèque getopt:} 
+En premier lieu nous nous sommes intéressés à la bibliothèque getopt qui nous permettait de parser 
+la ligne de commande pour trouver les options notamment grâce à \textbf{optind} et \textbf{optarg}. Nous pouvions également préciser 
+quelles options nécessitaient des paramètres comme pour l'option qui permet de fixer la taille 
+maximale des mots \textbf{-iVALUE} ou \textbf{--initial=VALUE}. Grâce à \textbf{getopt}
+nous avons pu implanter les options très rapidement, mais nous avons rencontrer un problème 
+lorsque nous voulions implanter l'option '--' permettant d'échapper le nom d'un fichier.
+En effet, lorsque nous utilisions cette option nous avons remarqué quelle échapait tous les 
+paramètres qui suivaient. Nous avons d'abord chercher une solution en remplacant \textbf{getopt}
+par \textbf{getopt\_long}. Ce qui nous compliquait la tâche. Finalement il a été choisi de parser
+nous même la ligne de commande pour avoir un contrôle total sur son traitement.
 
 \subsection{La fonction fscanf}\label{subsec:fscanf}
+\paragraph{utilisation de fscanf:}
+Afin de créer les arbres comme nous l'avons décrit dans la section \textbf{\ref{subsec:files}} nous avons
+besoin de lire dans les fichiers, pour se faire il convient d'usage d'utiliser la fonction \textbf{fscanf}, et c'est le choix
+que nous avions fait lors de la première partie du projet cependant, après avoir essayer d'implémenter l'option 
+-p (resp. --punctuation-like-space) nous avions un problème de compréhension de la fonction. Il fallait de plus
+reparser le buffer que nous prenions afin de l'analyser par la suite. En outre cela revenait à lire chacun des caractères
+deux fois et donc de doubler la compléxité temporelle. Il a été alors naturellement convenu de coder notre propre
+fonction de lecture  d'où l'appartion de la fonction statique \textbf{hm\_\_fscanf} (hm pour home maid). Ainsi nous lisons
+caractère par caractère dans le fichier donné par la tête de lecture en paramètre grâce à la fonction \textbf{fgetc}.
+Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non.
 
 \section{Performances}\label{sec:perf}
+\paragraph{Analyse de quelques données:}
+Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
+une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
 
 \subsection{Compléxité en espace}
 
