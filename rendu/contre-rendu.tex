@@ -8,6 +8,12 @@
 \usepackage{xcolor}
 \usepackage{tocloft}
 \usepackage{palatino}  % Police
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[
+backend=biber,
+style=alphabetic,
+]{biblatex}
 
 \usetikzlibrary{backgrounds, shapes.geometric, positioning}
 
@@ -17,7 +23,7 @@
 \fancyhf{}
 \fancyhead[L]{Distance de Jaccard}
 \fancyhead[R]{Projet Algorithmie 3}
-\fancyhead[C]{De - backer Cuvelier Sébastien Llobregat Nicolas}
+\fancyhead[C]{De-backer Cuvelier Sébastien Llobregat Nicolas}
 \fancyfoot[C]{\thepage}
 
 \renewcommand{\contentsname}{Table des matières}
@@ -31,7 +37,7 @@
     \node[align=center, text width=0.8\textwidth, font=\huge\bfseries] at (current page.center) {
         Projet Algorithmie 3 La distance de Jaccard};
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
-        De - backer Cuvelier Sébastien Llobregat Nicolas};
+        De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
         Version du 08 Avril 2025};
   \end{tikzpicture}
@@ -102,7 +108,7 @@ avons pu communiquer efficacement pour communiquer sur les tâches que nous éti
 
 \section{Structure du projet}
 
-\paragraph{Origine}
+\paragraph{Origine:}
 Lors de la conception de notre binôme nous avons décider de faire une lecture commune du sujet
 afin de savoir si nous avions la même vision. Ainsi nous avons organiser la structure du projet
 à l'origine puis nous nous sommes mis d'accord sur les modules à utiliser. Entre les deux
@@ -119,7 +125,8 @@ Les modules utilisés sont:
   \item Le module \textbf{op}
 \end{itemize}
 
-\paragraph{Le module holdall} Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, afin de séparer 
+\paragraph{Le module holdall:}
+ Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, afin de séparer 
 le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
 \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} et par exemple liberer les ressources 
 en même temps que le dernier parcours de chaque arbre. Nous avons égelment décider
@@ -131,76 +138,241 @@ Nous avons décider de créer un module spécifique pour gérer la liaison entre
 et notre utilisation, il consiste principalement à convertir un fichier ou l'entrée standart (voir \textbf{\ref{subsec:stdin}})
 en un \textbf{avl}. En le calcul du cardinal de l'intersection des ensembles de mots stockés dans les
 arbres. Et bien évidemment au calcul de la distance de Jaccard entre chaque couple deux à deux distincts
-des ensembles représentés par les arbres.
+des ensembles représentés par les arbres sur laquelle nous reviendrons dans la sous section \textbf{\ref{subsec:jdis}}.
+
+\paragraph{Le module op:}
+Il permet principalement d'intervenir lors de l'affichage sur la sortie standart et permet ainsi de 
+désengorger le main et le rendre plus clair. Il comprend donc la fonction qui affiche l'aide ainsi que le 
+graph d'appartenance des mots.
 
 \subsection{Gestion des options}
 
-\subsection{Gestion de l'entrée standart}
-\label{subsec:stdin}
+\subsection{Gestions des fichiers}
+Pour gerer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
+associé en mode lecture seule puis nous lisons (précisions \textbf{\ref{subsec:fscanf}}) chaque
+mot et nous tentons de l'ajouter à l'arbre binaire associé. À la fin de la lecture nous avons
+un arbre contenant des pointeurs vers les mots. Il est à noté que pour un même fichier, on stocke
+en un et un seul exemplaire les mots appraissant plusieurs fois dans le même fichier. Nous avons un
+tableau avec l'ensemble des arbres créer.
+
+\paragraph{Exemple:}
+Ainsi si nous executons la commande suivante: \colorbox{lightgray!20}{\textit{./jdis x0.txt x1.txt x2.txt}}
+où les fichiers x0.txt et x1.txt sont ceux donnés dans le sujet du projet, nous aurons la representation
+suivante:
+\begin{center}
+  \begin{tikzpicture}
+    \node (case1) at (0, 0) [rectangle, draw, minimum width=1cm, minimum height=3cm] {x2.txt};
+    \node (case2) at (0, -3) [rectangle, draw, minimum width=1cm, minimum height=3cm] {x1.txt};
+    \node (case3) at (0, -6) [rectangle, draw, minimum width=1cm, minimum height=3cm] {x0.txt};
+    
+    \node at (-1, 0) {\textbf{\textcolor{red}{2}}};
+    \node at (-1, -3) {\textbf{\textcolor{red}{1}}};
+    \node at (-1, -6) {\textbf{\textcolor{red}{0}}};
+    \node at (0, 2) {\textbf{\textcolor{red}{t}}};
+
+    \draw[->, bend right=25] (case1) to node[below] {} (-5.78, 2.5);
+    \draw[->, bend right=25] (case2) to node[below] {} (-5.7, -3.5);
+    \draw[-] (case3) to node[below] {} (2, -3.5);
+    \draw[->, bend left=40] (2, -3.5) to (3.85, -3);
+      
+      \node at (-6, 0.25) {
+        \begin{tikzpicture}[
+          scale=0.65,
+          sibling distance=70mm,
+          level distance=20mm,
+          every node/.style={draw, fill=gray!20, circle},
+          edge from parent/.style={draw, thick},
+          level 1/.style={sibling distance=80mm},
+          level 2/.style={sibling distance=40mm},
+          level 3/.style={sibling distance=20mm}
+        ]
+          \node {dddd}
+            child { node {bb}
+                child { node {a} }
+                child { node {ccc} }
+            }
+            child { node {hhhh}
+                child { node {ffffff}
+                child { node {eeeee} }
+                child { node {ggggg} }
+            }
+                child { node {jj} 
+                child { node {iii} }  
+                child { node {k} }  
+              }
+            };
+        \end{tikzpicture}
+          
+      };
+      
+      \node at (-6, -4.85) {
+          \begin{tikzpicture}[
+            scale=0.5,
+            sibling distance=70mm,
+            level distance=20mm,
+            every node/.style={draw, fill=gray!20, circle},
+            edge from parent/.style={draw, thick},
+            level 1/.style={sibling distance=80mm},
+            level 2/.style={sibling distance=40mm},
+            level 3/.style={sibling distance=20mm}
+          ]
+            \node {rrrr}
+              child { node {eee}
+                  child { node {a} }
+                  child { node {} }
+              }
+              child { node {yyyyyy}
+                  child { node {ttttt} }
+                  child { node {zz} }
+              };
+          \end{tikzpicture}
+      };
+      
+      \node at (4.5, -4.5){
+        \begin{tikzpicture}[
+          scale=0.5,
+          sibling distance=70mm,
+          level distance=20mm,
+          every node/.style={draw, fill=gray!20, circle},
+          edge from parent/.style={draw, thick},
+          level 1/.style={sibling distance=80mm},
+          level 2/.style={sibling distance=40mm},
+          level 3/.style={sibling distance=20mm}
+        ]
+          \node {oooo}
+            child { node {ee}
+                child { node {a} }
+                child { node {iii} }
+            }
+            child { node {uuuu}
+                child { node {} }
+                child { node {yyyyyy} }
+            };
+        \end{tikzpicture}
+      };
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \colorbox{lightgray!20}{\textit{\underline{Exemple 1: Conversion d'un fichier en arbre}}}
+\end{center}
+
+\subsection{Gestion de l'entrée standart}\label{subsec:stdin}
+\paragraph{Questionnement:}
+Nous avons réfléchi comment traiter l'argument particulier \textbf{'-'}, deux Choix
+s'offraient alors à nous, créer l'arbre depuis l'entrée standart directement et donc différencier
+très clairement les fichiers de l'entrée standart ou bien de stocker l'entrée standart dans un fichier
+puis effectuer le même traitement que sur les autres arguments sans distinction aucune. Dans un soucis
+d'homogénéité c'est cette deuxième implémentation qui a été seléctionnée.
+
+\paragraph{Utilisation d'un fichier temporaire:}
+La situation se prête parfaitement à un fichier temporaire, comme vu en cours d'Algorithmie 1, 
+page 39 du support de cours et d'exercices de 2023:
+\begin{center}
+  \colorbox{lightgray!20}{
+    \begin{minipage}{0.85\textwidth}
+      \textit{
+        La fonction \texttt{tmpfile}:\\
+        Crée un fichier temporaire ouvert en mode \texttt{w+b}. Ce fichier sera automatiquement supprimé lors 
+        de sa fermeture ou d'une terminaison normale du programme; En cas de succès, renvoie un pointeur vers le contrôleur du flot ;
+        En cas d'échec, renvoie \texttt{NULL}.
+      }
+    \end{minipage}
+  }
+\end{center}
+d'où la création de la fonction statique \textbf{stdin\_\_to\_file} dans le module jdis.
+À la suite de ce traitement l'entrée standart est gérée exactement comme les fichiers normaux.
+
+
 
 \section{Choix d'implémentation}
 
 \subsection{Stockage des mots avec holdall}
 
-\subsubsection{Implémentation par LDSC}
-\label{subsec:impl}
+\subsubsection{Implémentation par LDSC}\label{subsec:impl}
 
 \subsubsection{Implémentation par tableaux dynamiques}
 
-\subsection{Module op}
+\section{Calcul de la distance de Jaccard}\label{subsec:jdis}
+\paragraph{Les paires distinctes:}
+Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
+rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
+Nous allons avoir a calculer la distance de Jaccard entre chaque couple deux à deux
+distincts d'arbres. Pour cela il suffit d'avoir deux boucles imbriquées: 
 
-\section{Calcul de la distance de Jaccard}
+\begin{lstlisting}[style=Cstyle]
+for (int i = 0; i < k - 1; ++i) {
+  for (int j = i + 1; j < k; ++j) {
+    . . .
+  }
+}  
+\end{lstlisting}
+\underline{La première boucle:} nous commençons à $i = 0$ et allons jusqu'à $i = k - 2$ (car $i < k - 1$)\\
+\underline{La deuxième boucle:} pour chaque valeur de $i$ nous commençons à $j = i + 1$ et va 
+jusqu'à $j = k - 1$ (car $j < k$).
+L'idée ici est de parcourir chaque combinaison unique de $i$ et $j$ où $i$ est strictement inférieur à $j$. 
+Cela permet de créer une paire unique sans répéter les mêmes éléments dans les deux positions.
 
-\subsection{Module jdis}
+\paragraph{Rappel sur la distance de Jaccard:}
+Nous devons maintenant effectuer le calcul de la distance de jaccard, petit rappel sur la formule:
+La \textbf{distance de Jaccard} entre deux ensembles \( A \) et \( B \) est définie par la formule suivante:
+
+\[
+J_{\delta}(A, B) = 
+\begin{cases} 
+0 & \text{si } A = \emptyset \wedge B = \emptyset, \\
+1 - \frac{|A \cap B|}{|A \cup B|} & \text{sinon.} \\
+\end{cases}
+\]
+
+\paragraph{Calcul du cardinal de l'union}
+Nous avons donc besoin du cardinal de l'intersection ainsi que le cardinal de l'union de chaque couple,
+pour cela nous allons en réalité ne calculer que le cardinal de l'intersection. En effet nous allons utiliser
+une petit astuce de la théorie des ensembles qui nous dit que: Le cardinal de l'union de deux ensemble ce n'est rien d'autre
+que la somme de leur cardinaux respectifs moins le cardinal de l'intersection. On peut facilement s'en rendre compte ici:
+
+\begin{center}
+\begin{tikzpicture}
+  \draw[fill=blue,opacity=0.5] (0,0) circle(2);
+  \draw[fill=red,opacity=0.5] (2,0) circle(2);
+
+  \node at (-1,1) {\textbf{A}};
+  \node at (3,1) {\textbf{B}};
+
+  \node at (1,0) {\textbf{A $\cap$ B}};
+  \node at (-2,-1.5) {\textbf{A$ \setminus $B}};
+  \node at (4,-1.5) {\textbf{B$ \setminus $A}};  
+\end{tikzpicture}
+\end{center}
+\begin{center}
+  \colorbox{lightgray!20}{\textit{\underline{Schéma 1: Généralités sur les ensembles}}}
+\end{center}
+
+\paragraph{Calcul du cardinal de l'intersection}
+Nous devons alors calculer l'intersection des deux ensembles, pour cela nous allons de nouveau
+utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl}. Cette fois-ci 
+nous allons un contexte qui sera une structure contenant un compteur ainsi que le plus petit des deux 
+ensmebles. Ansi nous allons parcourir le plus grand des deux et rechercher dans le plus petit la référence 
+grâce à la fonction \textbf{bst\_search} du module \textbf{avl}. Si on la trouve alors on ajoute un au compteur
+cela veut dire qu'elle se trouve dans les deux sinon non. A la fin dans le contexte nous aurons le cardinal de l'ensemble.
+
+\paragraph{Calcul final:}
+Il nous reste plus qu'à rassembler les élements, ainsi nous avons:
+Un moins le cardinal de l'intersection divisé par la taille des deux arbres moins le cardinal de l'intersection ce qui nous donne
+la distance de Jaccard entre les deux ensembles de mots de la paire de fichiers. On peut alors réitéré sur toutes les paires.
 
 \section{Les difficultés rencontrées}
 
 \subsection{Tentative d'utilisation de getopt}
 
-\subsection{La fonction fscanf}
+\subsection{La fonction fscanf}\label{subsec:fscanf}
 
-\section{Performances}
-\label{sec:perf}
+\section{Performances}\label{sec:perf}
 
 \subsection{Compléxité en espace}
 
 \subsection{Compléxité en temps}
 
 \section{Améliorations possibles}
-
-\begin{center}
-    \begin{tikzpicture}[
-      sibling distance=70mm,
-      level distance=20mm,
-      every node/.style={draw, fill=gray!20, circle},
-      edge from parent/.style={draw, thick},
-      level 1/.style={sibling distance=80mm},
-      level 2/.style={sibling distance=40mm},
-      level 3/.style={sibling distance=20mm}
-    ]
-      \node {iii}
-        child { node {ee}
-            child { node {a} }
-            child { node {oooo} }
-        }
-        child { node {uuuuu}
-            child { node {uuu}
-            child { node {o} }
-            child { node {uuuu} }
-        }
-            child { node {yyyyyy} }
-        };
-  \end{tikzpicture}
-\end{center}
-
-\begin{lstlisting}[style=Cstyle]
-#include <stdio.h>
-
-// Voici la fonction main.
-int main() {
-    printf("Hello, World!\n");
-    return 0;
-}
-\end{lstlisting}
 
 \end{document}
