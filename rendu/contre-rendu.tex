@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{tocloft}
+\usepackage{palatino}  % Police
 
 \usetikzlibrary{backgrounds, shapes.geometric, positioning}
 
@@ -16,13 +17,14 @@
 \fancyhf{}
 \fancyhead[L]{Distance de Jaccard}
 \fancyhead[R]{Projet Algorithmie 3}
+\fancyhead[C]{De - backer Cuvelier Sébastien Llobregat Nicolas}
 \fancyfoot[C]{\thepage}
 
 \renewcommand{\contentsname}{Table des matières}
 
 \setlength{\cftbeforesecskip}{20pt}
-\setlength{\cftbeforesubsecskip}{11pt}
-\setlength{\cftbeforesubsubsecskip}{8pt}
+\setlength{\cftbeforesubsecskip}{10pt}
+\setlength{\cftbeforesubsubsecskip}{5pt}
 
 \newcommand{\fondpremierepage}{
   \begin{tikzpicture}[remember picture, overlay]
@@ -58,32 +60,90 @@
   stringstyle=\color{purple}            % Colorier les chaînes en violet
 }
 
+\linespread{1.5}
+
 \begin{document}
 
 \fondpremierepage{}
 \thispagestyle{empty}
 
-\newpage
+\newpage{}
+
 \tableofcontents
-\newpage
 
 \section{Organisation du travail}
 
-\subsection{Répartition du travail}
-
 \subsection{Outils utilisés}
 
+\paragraph{Git \& Github:}
+Pour la gestion du projet et des différentes versions de celui-ci nous avons fait le choix
+d'utiliser un logiciel de versionning: \textbf{GIT}. Ainsi nous avons pu travailler en 
+simultané sur les différentes composantes du projet. La methodologie était la suivante:
+Créations des tâches via les issues \textbf{Github}. Puis création d'une branche spécifique
+pour chaque tâche à réaliser. Une fois le travail réaliser nous ouvrons une \textbf{pull request}
+pour que notre binôme puisse analyser le travail de l'autre avant de mutualiser sur la branche
+principale.
+
+\paragraph{Tests unitaires:}
+Nous avions pour ambition d'utiliser les tests unitaires pour s'assurer que chaque fonction
+réalisait bien ce qu'elle devait, pour se faire nous avions commencer à utiliser une bibliothèque
+qui permettait assez simplement de les réalilser: \textbf{greatest}. Cependant il s'est avéré
+très chronophage et nous avons pris du retard sur ces tests ce qui leur a fait perdre toute utilité.
+Nous avons donc choisi de ne pas les inclure dans notre version finale du projet. 
+
+\subsection{Répartition du travail}
+
+\paragraph{Mesure de la charge de travail:}
+Au début du projet nous n'avions pas réellement conscience de la charge de travail à effectuer.
+Il aurait peut-être été intéréssant de lors de la première séance de réaliser un planning
+avec un tableau de répartition des tâches pour définir une charge de travail équitable. Cependant
+le projet n'étant pas de grande envergure et étant en effectif réduis à deux personnes nous 
+avons pu communiquer efficacement pour communiquer sur les tâches que nous étions entrain de réaliser. 
+
 \section{Structure du projet}
+
+\paragraph{Origine}
+Lors de la conception de notre binôme nous avons décider de faire une lecture commune du sujet
+afin de savoir si nous avions la même vision. Ainsi nous avons organiser la structure du projet
+à l'origine puis nous nous sommes mis d'accord sur les modules à utiliser. Entre les deux
+implémentations suggérées soit l'utilisation de \textbf{tables de hachages} ou bien \textbf{d'abres binaires
+de recherches equillibrés}, c'est la deuxième qui nous a paru la plus adéquates. En effet il est plus
+facile de représenter les arbres et nous avions beaucoup plus travailler sur cette notion en cours.
+
+\subsection{Les modules}
+Les modules utilisés sont:
+\begin{itemize}
+  \item Le module \textbf{avl}
+  \item Le module \textbf{holdall}
+  \item Le module \textbf{jdis} 
+  \item Le module \textbf{op}
+\end{itemize}
+
+\paragraph{Le module holdall} Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, afin de séparer 
+le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
+\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} et par exemple liberer les ressources 
+en même temps que le dernier parcours de chaque arbre. Nous avons égelment décider
+de tester cette solution en parallèle et nous en faisons référence dans la section \textbf{\ref{sec:perf}}
+liée aux performances de l'implémentation proposée.
+
+\paragraph{Le module jdis:}
+Nous avons décider de créer un module spécifique pour gérer la liaison entre le module \textbf{avl}
+et notre utilisation, il consiste principalement à convertir un fichier ou l'entrée standart (voir \textbf{\ref{subsec:stdin}})
+en un \textbf{avl}. En le calcul du cardinal de l'intersection des ensembles de mots stockés dans les
+arbres. Et bien évidemment au calcul de la distance de Jaccard entre chaque couple deux à deux distincts
+des ensembles représentés par les arbres.
 
 \subsection{Gestion des options}
 
 \subsection{Gestion de l'entrée standart}
+\label{subsec:stdin}
 
 \section{Choix d'implémentation}
 
 \subsection{Stockage des mots avec holdall}
 
 \subsubsection{Implémentation par LDSC}
+\label{subsec:impl}
 
 \subsubsection{Implémentation par tableaux dynamiques}
 
@@ -100,14 +160,13 @@
 \subsection{La fonction fscanf}
 
 \section{Performances}
+\label{sec:perf}
 
 \subsection{Compléxité en espace}
 
 \subsection{Compléxité en temps}
 
 \section{Améliorations possibles}
-
-\section{Arbre exemple}
 
 \begin{center}
     \begin{tikzpicture}[
@@ -131,12 +190,8 @@
         }
             child { node {yyyyyy} }
         };
-    \end{tikzpicture}
-    \end{center}
-
-\newpage
-
-\section{Exemple de code}
+  \end{tikzpicture}
+\end{center}
 
 \begin{lstlisting}[style=Cstyle]
 #include <stdio.h>
@@ -147,7 +202,5 @@ int main() {
     return 0;
 }
 \end{lstlisting}
-
-\newpage
 
 \end{document}
