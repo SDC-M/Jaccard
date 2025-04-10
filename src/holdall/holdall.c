@@ -3,15 +3,18 @@
 #include "holdall.h"
 #include <stdio.h>
 
-#define CAPACITY_MIN 2
-#define CAPACITY_MUL 2
+typedef struct choldall choldall;
 
-#define VALUE_ALREADY_EXIST 1
-#define LACK_OF_MEMORY -1
+struct choldall {
+  void *ref;
+  choldall *next;
+};
 
 struct holdall {
-  char **aref;
-  size_t cap;
+  choldall *head;
+#if defined HOLDALL_PUT_TAIL
+  choldall **tailptr;
+#endif
   size_t count;
 };
 
@@ -20,12 +23,10 @@ holdall *holdall_empty() {
   if (ha == nullptr) {
     return nullptr;
   }
-  ha->aref = malloc(CAPACITY_MIN * sizeof(*(ha->aref)));
-  if (ha->aref == nullptr) {
-    free(ha);
-    return nullptr;
-  }
-  ha->cap = CAPACITY_MIN;
+  ha->head = nullptr;
+#if defined HOLDALL_PUT_TAIL
+  ha->tailptr = &ha->head;
+#endif
   ha->count = 0;
   return ha;
 }
@@ -34,31 +35,30 @@ void holdall_dispose(holdall **haptr) {
   if (*haptr == nullptr) {
     return;
   }
-  for (size_t i = 0; i < (*haptr)->count; i += 1) {
-    free((*haptr)->aref[i]);
+  choldall *p = (*haptr)->head;
+  while (p != nullptr) {
+    choldall *t = p;
+    p = p->next;
+    free(t);
   }
-  free((*haptr)->aref);
   free(*haptr);
   *haptr = nullptr;
 }
 
 int holdall_put(holdall *ha, void *ref) {
-  if (ha->count == ha->cap) {
-    char **new_array = realloc(ha->aref,
-          CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
-    if (new_array == nullptr){
-      return LACK_OF_MEMORY;
-    }
-    ha->cap *= CAPACITY_MUL;
-    ha->aref = new_array;
+  choldall *p = malloc(sizeof *p);
+  if (p == nullptr) {
+    return -1;
   }
-  for (size_t i = 0; i < ha->count; ++i) {
-    char *val = ha->aref[i];
-    if (val == ref) {
-      return VALUE_ALREADY_EXIST;
-    }
-  }
-  ha->aref[ha->count] = ref;
+  p->ref = ref;
+#if defined HOLDALL_PUT_TAIL
+  p->next = nullptr;
+  *ha->tailptr = p;
+  ha->tailptr = &p->next;
+#else
+  p->next = ha->head;
+  ha->head = p;
+#endif
   ha->count += 1;
   return 0;
 }
@@ -69,8 +69,8 @@ size_t holdall_count(holdall *ha) {
 
 int holdall_apply(holdall *ha,
     int (*fun)(void *)) {
-  for (size_t i = 0; i < ha->count; ++i) {
-    int r = fun(ha->aref[i]);
+  for (const choldall *p = ha->head; p != nullptr; p = p->next) {
+    int r = fun(p->ref);
     if (r != 0) {
       return r;
     }
@@ -81,8 +81,8 @@ int holdall_apply(holdall *ha,
 int holdall_apply_context(holdall *ha,
     void *context, void *(*fun1)(void *context, void *ptr),
     int (*fun2)(void *ptr, void *resultfun1)) {
-  for (size_t i = 0; i < ha->count; ++i) {
-    int r = fun2(ha->aref[i], fun1(context, ha->aref[i]));
+  for (const choldall *p = ha->head; p != nullptr; p = p->next) {
+    int r = fun2(p->ref, fun1(context, p->ref));
     if (r != 0) {
       return r;
     }
@@ -93,8 +93,8 @@ int holdall_apply_context(holdall *ha,
 int holdall_apply_context2(holdall *ha,
     void *context1, void *(*fun1)(void *context1, void *ptr),
     void *context2, int (*fun2)(void *context2, void *ptr, void *resultfun1)) {
-  for (size_t i = 0; i < ha->count; ++i) {
-    int r = fun2(context2, ha->aref[i], fun1(context1, ha->aref[i]));
+  for (const choldall *p = ha->head; p != nullptr; p = p->next) {
+    int r = fun2(context2, p->ref, fun1(context1, p->ref));
     if (r != 0) {
       return r;
     }
@@ -104,51 +104,35 @@ int holdall_apply_context2(holdall *ha,
 
 #if defined HOLDALL_WANT_EXT && HOLDALL_WANT_EXT != 0
 
-static void swap(const void **aref, size_t i, size_t j){
-  const void *tmp = aref[i];
-  aref[i] = aref[j];
-  aref[j] = tmp;
+static void swap(choldall *a, choldall *b) {
+  void *temp = a->ref;
+  a->ref = b->ref;
+  b->ref = temp;
 }
 
-
-//  heapsort_down : il est supposé que base est l'adresse du premier composant
-//    d'un tableau de longueur nmemb et de taille de composants size, que
-//    nmemb >= 1, que k <= nmemb - 1 et que le tableau est un maximier sur
-//    [ k + 1 ... nmemb - 1 ] relativement à la fonction de comparaison pointée
-//    par compar. Descend le composant d'indice k à la bonne place de manière à
-//    faire du tableau un maximier sur [ k ... nmemb - 1 ].
-
-static void heapsort_down(char *base, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *), size_t k){
-  size_t i = k;
-  while (true){
-    size_t max = i;
-    size_t left = 2 * i + 1;
-    size_t right = 2 * i + 2;
-    if (left < nmemb && compar(base + left * size, base + max * size) > 0){
-      max = left;
+extern void holdall_sort(holdall *ha,
+    int (*compar)(const void *, const void *)) {
+  if (ha->head == nullptr) {
+    return;
+  }
+  int swapped;
+  choldall *p = nullptr;
+  choldall *q = nullptr;
+  for (size_t i = 0;; ++i) {
+    swapped = 0;
+    p = ha->head;
+    while (p->next != nullptr) {
+      q = p->next;
+      if (compar(p->ref, q->ref) > 0) {
+        swap(p, q);
+        swapped = 1;
+      }
+      p = p->next;
     }
-    if (right < nmemb && compar(base + right * size, base + max * size) > 0){
-      max = right;
-    }
-    if (max == i){
+    if (swapped == 0) {
       break;
     }
-    mem_swap(base + i * size, base + max * size, size);
-    i = max;
   }
 }
 
-void holdall_sort(holdall *ha
-    int (*compar)(const void *, const void *)){
-
-  for (size_t k = 0 ; k < ha->count; k += 1){
-    size_t icur = ((nmemb / 2) - k - 1);
-    heapsort_down((char *)base, nmemb, size, compar, icur);
-  }
-  for (size_t nb = ha->count; nb > 0; --nb){
-    swap(ha->aref, nb, 0);
-    heapsort_down(ha->aref, ha->count, 1, compar, 0);
-  }
-}
 #endif
