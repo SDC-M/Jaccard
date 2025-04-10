@@ -32,9 +32,9 @@ static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
   for (int i = 0; i < ctx->nb_bst; ++i) {
     if (bst_search(ctx->t[i], ref) != nullptr) {
-      printf("x\t");
+      fprintf(stdout, "x\t");
     } else {
-      printf("-\t");
+      fprintf(stdout,"-\t");
     }
   }
   printf("\n");
@@ -49,8 +49,7 @@ int graph_belonging(bst **t, bst *uni, int nb_file) {
   ctx->nb_bst = nb_file;
   ctx->t = t;
   bst_dft_infix_apply_context(uni, 1, ctx,
-      (int (*)(void *, const void *)) scptr_display, nullptr,
-      nullptr);
+      (int (*)(void *, const void *)) scptr_display, nullptr, nullptr);
   free(ctx);
   return 0;
 }

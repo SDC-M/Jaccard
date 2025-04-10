@@ -147,5 +147,5 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
 }
 
 int add_element(bst *t, const void *ref) {
-  return (bst_add_endofpath(t, ref) != ref) ? 1 : 0;
+  return (bst_add_endofpath(t, ref) == nullptr) ? 1 : 0;
 }

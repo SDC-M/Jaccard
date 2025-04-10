@@ -31,7 +31,11 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   for (int i = 1; i < argc; ++i) {
-    if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
+    if (escaped_file) {
+      filenames[nb_files] = argv[i];
+      escaped_file = false;
+      ++nb_files;
+    } else if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
       help();
     } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i],
           "--punctuation-like-space") == 0) {
@@ -44,10 +48,6 @@ int main(int argc, char *argv[]) {
       value_max = atoi(argv[i] + LEN_SHORT_OPT_INITIAL);
     } else if (strcmp(argv[i], "--") == 0) {
       escaped_file = true;
-    } else if (escaped_file) {
-      filenames[nb_files] = argv[i];
-      escaped_file = false;
-      ++nb_files;
     } else {
       filenames[nb_files] = argv[i];
       ++nb_files;
