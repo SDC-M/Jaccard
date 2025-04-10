@@ -118,20 +118,14 @@ facile de représenter les arbres et nous avions beaucoup plus travailler sur ce
 
 \subsection{Les modules}
 Les modules utilisés sont:
-\begin{itemize}
-  \item Le module \textbf{avl}
-  \item Le module \textbf{holdall}
-  \item Le module \textbf{jdis} 
-  \item Le module \textbf{op}
-\end{itemize}
+Les modules utilisés sont: \textbf{avl}, \textbf{holdall}, \textbf{jdis}, \textbf{op}.
 
 \paragraph{Le module holdall:}
  Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, afin de séparer 
 le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
-\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} et par exemple liberer les ressources 
-en même temps que le dernier parcours de chaque arbre. Nous avons égelment décider
-de tester cette solution en parallèle et nous en faisons référence dans la section \textbf{\ref{sec:perf}}
-liée aux performances de l'implémentation proposée.
+\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
+Nous avons égelment décider de tester cette solution en parallèle et nous en faisons référence dans
+la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
 
 \paragraph{Le module jdis:}
 Nous avons décider de créer un module spécifique pour gérer la liaison entre le module \textbf{avl}
@@ -145,7 +139,49 @@ Il permet principalement d'intervenir lors de l'affichage sur la sortie standart
 désengorger le main et le rendre plus clair. Il comprend donc la fonction qui affiche l'aide ainsi que le 
 graph d'appartenance des mots.
 
-\subsection{Gestion des options}
+\subsection{Gestion des options:}
+\paragraph{Généralités:}
+Pour ce qui est de la gestion des options, nous avons décidé d'implanter à la fois les options longues et les options courtes.
+Les paragraphes qui suivent préciseront ce que ces options font et comment elles le font.
+
+\paragraph{L'option -? / --help:}
+Cette option est très simple, elle permet d'afficher le menu d'aide pour l'utilisation 
+de notre exécutable et affiche par conséquent des précisions sur les options supportées.
+
+\paragraph{L' option -g / --graph:}
+Cette option permet d'afficher un graphe d'appartenance des mots dans les différents 
+fichiers passés sur la ligne de commande. Cette fonction est divisé en deux parties.
+
+\begin{lstlisting}[style=Cstyle]
+  static int scptr_display(context *ctx, const char *ref); 
+\end{lstlisting}
+Cette fonction permet d'afficher une ligne du graph, pour se faire le procésus est assez simple,
+nous allons itérer sur les arbres présents dans le tableau contenu lui même dans le contexte qui est pris en paramètre.
+Ainsi nous allons rechercher la présence de chaque mot présent dans l'arbre de l'union des fichiers dans les arbres, 
+le cas échéant nous affichons sur la colonne 'x' indiquant que le fichier contient la référence sinon '-'.
+Cette fonction est alors utilisée dans la fonction principale et non statique:
+\begin{lstlisting}[style=Cstyle]
+  int graph_belonging(bst **t, bst *uni, int nb_file); 
+\end{lstlisting}
+Celle-ci va utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour appliquer le traitement
+à chauqe mot de l'arbre des unions.
+
+\paragraph{L'option -iVALUE / --initial=VALUE:}
+Cette option permet de fixer la taille des mots à \textbf{VALUE}.
+Celle-ci est traité au moment de la lecture des mots et permet de signaler qu'il faut ignorer tous les caractères dépassant cette
+limite jusqu'au prochain caractère de séparation (voir \textbf{\ref{subsec:fscanf}}).
+
+\paragraph{L'option -p / --punctuation-like-space:}
+Cette option permet d'indiquer à la fonction de lecture que les caractères de ponctuation de la classe \texttt{isspace} et \texttt{ispunct}
+doivent être concidérer comme des séparateurs pour segmentation des mots.
+
+\paragraph{L'option \texttt{--}:}
+Cette option permet d'échapper l'argument qui suit sur la ligne de commande. Si nous avons un fichier appelé 
+\texttt{--help}, par exemple, cette option nous permet de traité ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
+Cela se fait tout simplement par le fait d'effectuer le test de comparaison de la présence de l'option en premier afin de stocke rle nom du fichier.
+
+\paragraph{L'option \texttt{-}:}
+Cette dernière option permet de rentrer des mots sur l'entrée standard pour qu'ils soient traité comme un fichier (voir \textbf{\ref{subsec:stdin}}).
 
 \subsection{Gestions des fichiers}\label{subsec:files}
 Pour gerer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
@@ -283,15 +319,29 @@ page 39 du support de cours et d'exercices de 2023:
 d'où la création de la fonction statique \textbf{stdin\_\_to\_file} dans le module jdis.
 À la suite de ce traitement l'entrée standart est gérée exactement comme les fichiers normaux.
 
-
-
 \section{Choix d'implémentation}
 
-\subsection{Stockage des mots avec holdall}
+\subsection{Stockage des mots avec holdall:}
+\paragraph{Généralités:}
+Deux versions de ce module ont été réfléchis pendant la création de ce projet. La premiere en utilisant le 
+principe des listes dynamiques simplement chainées et la seconde en utilisant les tableaux dynamiques.
+\subsubsection{Implémentation par LDSC:}\label{subsec:impl}=
+Pendant les cours d'algorithmique, nous avons étudié les listes dynamiques simplement chaînées (LDSC).
+Ce type de structure permet d'ajouter rapidement des éléments en tête de liste, en temps constant,
+ce qui est très avantageux en termes de performance. En effet, chaque ajout nécessite juste de créer
+un nouveau maillon et de modifier un pointeur, sans avoir à déplacer d'autres éléments. 
+Cependant, cette rapidité a un coût: chaque maillon prend plus de mémoire car il contient un pointeur en 
+plus de la donnée. Cela devient encombrant quand les fichiers sont volumineux. De plus, l'accès à un élément précis 
+est plus lent car il faut parcourir la liste depuis le début.
+\subsubsection{Implémentation par tableaux dynamiques:}
+Pour résoudre le problème d'espace nous avons pensé aux tableaux dynamiques. En effet l'avantage, ici,
+est que les ajouts se font également en temps constant grâce à un accès direct au cellules du tableaux et nous n'avions
+pas besoin d'allouer toute une cellule de liste pour un seul mot; nous avions juste à allouer un tableaux assez grand pour
+stocker les mots. Pour les petits fichiers cette implémentation s'est montré très efficace mais pour les gros fichiers
+le programme passait énormément de temps à recopier les données déjà présentes dans le tableau.
 
-\subsubsection{Implémentation par LDSC}\label{subsec:impl}
-
-\subsubsection{Implémentation par tableaux dynamiques}
+\paragraph{Conclusion:}
+Nous avons décider de conserver le module avec les LDSC pour privillégier l'efficacité temporelle de notre exécutable.
 
 \section{Calcul de la distance de Jaccard}\label{subsec:jdis}
 \paragraph{Les paires distinctes:}
@@ -394,7 +444,6 @@ Nous allons analyser quelques données afin d'avoir une idée de la performance 
 une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
 
 \subsection{Compléxité en espace}
-
 
 \subsection{Compléxité en temps}
 
