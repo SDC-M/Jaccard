@@ -13,13 +13,15 @@ void help(void) {
       "Utilisation : ./jdis [OPTIONS]... FICHIER1 FICHIER2 ...\n\n");
   fprintf(stdout,
       "Liste des opérations réalisables :\n\n");
-  fprintf(stdout, " -? : Affiche ce menu d'aide.\n");
+  fprintf(stdout, " -? / --help : Affiche ce menu d'aide.\n");
   fprintf(stdout,
-      " -g : Affiche le graphe d'appartenance des mots."
+      " -g / --graph: Affiche le graphe d'appartenance des mots."
       "dans les fichiers passés sur la ligne de commande.\n");
-  fprintf(stdout, " -i VALUE : permet de fixer la longueur maximale."
+  fprintf(stdout,
+      " -i / --initial VALUE : permet de fixer la longueur maximale."
       "des mots à VALUE.\n");
-  fprintf(stdout, " -p : Considère les caractères de ponctuation."
+  fprintf(stdout,
+      " -p / --punctuation-like-space : Considère les caractères de ponctuation."
       "comme des caractères d'espacement.\n");
   fprintf(stdout,
       " -- : Indique que l'argument qui suit doit être "
@@ -34,7 +36,7 @@ static int scptr_display(context *ctx, const char *ref) {
     if (bst_search(ctx->t[i], ref) != nullptr) {
       fprintf(stdout, "x\t");
     } else {
-      fprintf(stdout,"-\t");
+      fprintf(stdout, "-\t");
     }
   }
   printf("\n");
