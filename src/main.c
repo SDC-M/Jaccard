@@ -13,6 +13,17 @@
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
 
+#define LONG_G "--graph"
+#define LONG_H "--help"
+#define LONG_I "--initial="
+#define LONG_P "--punctuation-like-space"
+#define ESCAPE_FILE "--"
+
+#define SHORT_G "-g"
+#define SHORT_H "-h"
+#define SHORT_I "-i"
+#define SHORT_P "-p"
+
 int rfree(void *ptr) {
   free(ptr);
   return 0;
@@ -35,18 +46,17 @@ int main(int argc, char *argv[]) {
       filenames[nb_files] = argv[i];
       escaped_file = false;
       ++nb_files;
-    } else if (strcmp(argv[i], "-?") == 0 || strcmp(argv[i], "--help") == 0) {
+    } else if (strcmp(argv[i], SHORT_H) == 0 || strcmp(argv[i], LONG_H) == 0) {
       help();
-    } else if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i],
-          "--punctuation-like-space") == 0) {
+    } else if (strcmp(argv[i], SHORT_P) == 0 || strcmp(argv[i], LONG_P) == 0) {
       want_punc = true;
-    } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "--graph") == 0) {
+    } else if (strcmp(argv[i], SHORT_G) == 0 || strcmp(argv[i], LONG_G) == 0) {
       graph = true;
-    } else if (strstr(argv[i], "--initial=") != nullptr) {
+    } else if (strstr(argv[i], LONG_I) != nullptr) {
       value_max = atoi(argv[i] + LEN_LONG_OPT_INITIAL);
-    } else if (strstr(argv[i], "-i") != nullptr) {
+    } else if (strstr(argv[i], SHORT_I) != nullptr) {
       value_max = atoi(argv[i] + LEN_SHORT_OPT_INITIAL);
-    } else if (strcmp(argv[i], "--") == 0) {
+    } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
       filenames[nb_files] = argv[i];
