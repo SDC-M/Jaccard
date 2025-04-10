@@ -7,6 +7,8 @@
 
 #define WORD_MAX_SIZE 50
 
+#define OPT_STDIN "-"
+
 struct ctx {
   bst *apply_set;
   size_t cptr;
@@ -107,7 +109,7 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
     return nullptr;
   }
   FILE *p = nullptr;
-  if (strcmp(file_name, "-") == 0) {
+  if (strcmp(file_name, OPT_STDIN) == 0) {
     if ((p = stdin__to_file()) == nullptr){
       return nullptr;
     }
