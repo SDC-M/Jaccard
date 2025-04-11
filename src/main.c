@@ -6,7 +6,6 @@
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
-#include "op/op.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
@@ -16,11 +15,74 @@
 #define LONG_I "--initial="
 #define LONG_P "--punctuation-like-space"
 #define ESCAPE_FILE "--"
+#define STDIN "-"
 
 #define SHORT_G "-g"
 #define SHORT_H "-h"
 #define SHORT_I "-i"
 #define SHORT_P "-p"
+
+typedef struct context context;
+
+struct context {
+  bst **t;
+  int nb_bst;
+};
+
+void help(void) {
+  fprintf(stdout,
+      "Utilisation : ./jdis [OPTIONS]... FICHIER1 FICHIER2 ...\n\n");
+  fprintf(stdout,
+      "Liste des opérations réalisables :\n\n");
+  fprintf(stdout,
+      LONG_H " / " SHORT_H " : Affiche ce menu d'aide.\n");
+  fprintf(stdout,
+      LONG_G " / " SHORT_G
+      ": Affiche le graphe d'appartenance des mots."
+      "dans les fichiers passés sur la ligne de commande.\n");
+  fprintf(stdout,
+      LONG_I "/" SHORT_I
+      " : permet de fixer la longueur maximale."
+      "des mots à VALUE.\n");
+  fprintf(stdout,
+      LONG_P " / " SHORT_P
+      " : Considère les caractères de ponctuation."
+      "comme des caractères d'espacement.\n");
+  fprintf(stdout,
+      ESCAPE_FILE
+      " : Indique que l'argument qui suit doit être "
+      "considéré comme un fichier.\n");
+  fprintf(stdout,
+      STDIN
+      " : À la place d'un nom de fichier indique qu'on prend en "
+      "concidération l'entrée standart.\n");
+}
+
+static int scptr_display(context *ctx, const char *ref) {
+  printf("%s\t", ref);
+  for (int i = 0; i < ctx->nb_bst; ++i) {
+    if (bst_search(ctx->t[i], ref) != nullptr) {
+      fprintf(stdout, "x\t");
+    } else {
+      fprintf(stdout, "-\t");
+    }
+  }
+  printf("\n");
+  return 0;
+}
+
+int graph_belonging(bst **t, bst *uni, int nb_file) {
+  context *ctx = malloc(sizeof *ctx);
+  if (ctx == nullptr) {
+    return -1;
+  }
+  ctx->nb_bst = nb_file;
+  ctx->t = t;
+  bst_dft_infix_apply_context(uni, 1, ctx,
+      (int (*)(void *, const void *)) scptr_display, nullptr, nullptr);
+  free(ctx);
+  return 0;
+}
 
 int rfree(void *ctx, const void *ref) {
   if (ctx == nullptr) {

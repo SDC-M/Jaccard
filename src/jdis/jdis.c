@@ -73,23 +73,6 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   return c == EOF ? EOF : 0;
 }
 
-// stdin__to_file : En cas de succès renvoie une tête de lecture vers un fichier
-//  temporaire en mode lecture seule, en cas d'échec renvoie nullptr.
-static FILE *stdin__to_file() {
-  FILE *p = tmpfile();
-  if (p == nullptr) {
-    fprintf(stderr, "*** Erreur lors de l'allocation pour l'entrée standart.");
-    return nullptr;
-  }
-  int c;
-  rewind(stdin);
-  while ((c = fgetc(stdin)) != EOF) {
-    fputc(c, p);
-  }
-  rewind(p);
-  return p;
-}
-
 // create__file : En cas de succès renvoie une tête de lecture du fichier ouvert
 //  en mode lecture seule de nom file_name, en cas d'échec renvoie nullptr.
 static FILE *create__file(char *file_name) {
@@ -106,9 +89,7 @@ static FILE *create__file(char *file_name) {
 bst *file_to_bst(char *file_name, int value_max, bool wp) {
   FILE *p = nullptr;
   if (strcmp(file_name, OPT_STDIN) == 0) {
-    if ((p = stdin__to_file()) == nullptr) {
-      return nullptr;
-    }
+    p = stdin;
   } else {
     if ((p = create__file(file_name)) == nullptr) {
       return nullptr;

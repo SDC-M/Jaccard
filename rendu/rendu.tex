@@ -41,7 +41,7 @@ style=alphabetic,
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 09 Avril 2025};
+        Version du 11 Avril 2025};
   \end{tikzpicture}
 }
 
@@ -119,7 +119,7 @@ de recherches equillibrés}, c'est la deuxième qui nous a paru la plus adéquat
 facile de représenter les arbres et nous avions beaucoup plus travailler sur cette notion en cours.
 
 \subsection{Les modules}
-Les modules utilisés sont: \textbf{avl}, \textbf{jdis}, \textbf{op}.
+Les modules utilisés sont: \textbf{avl}, \textbf{jdis}.
 
 \paragraph{Le module jdis:}
 Nous avons décider de créer un module spécifique pour gérer la liaison entre le module \textbf{avl}
@@ -127,11 +127,6 @@ et notre utilisation, il consiste principalement à convertir un fichier ou l'en
 en un \textbf{avl}. En le calcul du cardinal de l'intersection des ensembles de mots stockés dans les
 arbres. Et bien évidemment au calcul de la distance de Jaccard entre chaque couple deux à deux distincts
 des ensembles représentés par les arbres sur laquelle nous reviendrons dans la sous section \textbf{\ref{subsec:jdis}}.
-
-\paragraph{Le module op:}
-Il permet principalement d'intervenir lors de l'affichage sur la sortie standart et permet ainsi de 
-désengorger le main et le rendre plus clair. Il comprend donc la fonction qui affiche l'aide ainsi que le 
-graph d'appartenance des mots.
 
 \subsection{Gestion des options:}
 \paragraph{Généralités:}
@@ -290,28 +285,10 @@ suivante:
 \subsection{Gestion de l'entrée standart}\label{subsec:stdin}
 \paragraph{Questionnement:}
 Nous avons réfléchi comment traiter l'argument particulier \textbf{'-'}, deux Choix
-s'offraient alors à nous, créer l'arbre depuis l'entrée standart directement et donc différencier
-très clairement les fichiers de l'entrée standart ou bien de stocker l'entrée standart dans un fichier
-puis effectuer le même traitement que sur les autres arguments sans distinction aucune. Dans un soucis
-d'homogénéité c'est cette deuxième implémentation qui a été seléctionnée.
-
-\paragraph{Utilisation d'un fichier temporaire:}
-La situation se prête parfaitement à un fichier temporaire, comme vu en cours d'Algorithmie 1, 
-page 39 du support de cours et d'exercices de 2023:
-\begin{center}
-  \colorbox{lightgray!20}{
-    \begin{minipage}{0.85\textwidth}
-      \textit{
-        La fonction \texttt{tmpfile}:\\
-        Crée un fichier temporaire ouvert en mode \texttt{w+b}. Ce fichier sera automatiquement supprimé lors 
-        de sa fermeture ou d'une terminaison normale du programme; En cas de succès, renvoie un pointeur vers le contrôleur du flot ;
-        En cas d'échec, renvoie \texttt{NULL}.
-      }
-    \end{minipage}
-  }
-\end{center}
-d'où la création de la fonction statique \textbf{stdin\_\_to\_file} dans le module jdis.
-À la suite de ce traitement l'entrée standart est gérée exactement comme les fichiers normaux.
+s'offraient alors à nous, créer l'arbre depuis l'entrée standart directement ou bien de stocker l'entrée standart dans un fichier
+puis effectuer le même traitement que sur les autres arguments sans distinction aucune. Dans un soucis d'efficacité
+c'est donc la première solution qui a été choisie. Dans le cas où l'on détécte '-' à la place d'un nom de fichier alors nous avons plus
+qu'à lire depuis l'entrée standart.
 
 \section{Choix d'implémentation}
 
@@ -349,7 +326,7 @@ Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
 rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
 Nous allons avoir a calculer la distance de Jaccard entre chaque couple deux à deux
 distincts d'arbres. Pour cela il suffit d'avoir deux boucles imbriquées: 
-
+\newpage{}
 \begin{lstlisting}[style=Cstyle]
 for (int i = 0; i < k - 1; ++i) {
   for (int j = i + 1; j < k; ++j) {
@@ -446,7 +423,6 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
-  \small
   \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
   \hline
   \rowcolor{gray!20}
@@ -468,7 +444,6 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
-  \small
   \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
   \hline
   \rowcolor{gray!20}
@@ -490,7 +465,6 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
-  \small
   \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
   \hline
   \rowcolor{gray!20}
