@@ -1,0 +1,47 @@
+\contentsline {section}{\numberline {1}Organisation du travail}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Outils utilisés}{3}{subsection.2}%
+\contentsline {paragraph}{Git \& Github:}{3}{section*.3}%
+\contentsline {paragraph}{Tests unitaires:}{3}{section*.4}%
+\contentsline {subsection}{\numberline {1.2}Répartition du travail}{3}{subsection.5}%
+\contentsline {paragraph}{Mesure de la charge de travail:}{3}{section*.6}%
+\contentsline {section}{\numberline {2}Structure du projet}{3}{section.7}%
+\contentsline {paragraph}{Origine:}{3}{section*.8}%
+\contentsline {subsection}{\numberline {2.1}Les modules}{3}{subsection.9}%
+\contentsline {paragraph}{Le module holdall:}{3}{section*.10}%
+\contentsline {paragraph}{Le module jdis:}{4}{section*.11}%
+\contentsline {paragraph}{Le module op:}{4}{section*.12}%
+\contentsline {subsection}{\numberline {2.2}Gestion des options:}{4}{subsection.13}%
+\contentsline {paragraph}{Généralités:}{4}{section*.14}%
+\contentsline {paragraph}{L'option -? / --help:}{4}{section*.15}%
+\contentsline {paragraph}{L' option -g / --graph:}{4}{section*.16}%
+\contentsline {paragraph}{L'option -iVALUE / --initial=VALUE:}{4}{section*.21}%
+\contentsline {paragraph}{L'option -p / --punctuation-like-space:}{4}{section*.22}%
+\contentsline {paragraph}{L'option \texttt {--}:}{5}{section*.23}%
+\contentsline {paragraph}{L'option \texttt {-}:}{5}{section*.24}%
+\contentsline {subsection}{\numberline {2.3}Gestions des fichiers}{5}{subsection.25}%
+\contentsline {paragraph}{Exemple:}{5}{section*.26}%
+\contentsline {subsection}{\numberline {2.4}Gestion de l'entrée standart}{6}{subsection.27}%
+\contentsline {paragraph}{Questionnement:}{6}{section*.28}%
+\contentsline {paragraph}{Utilisation d'un fichier temporaire:}{6}{section*.29}%
+\contentsline {section}{\numberline {3}Choix d'implémentation}{6}{section.30}%
+\contentsline {subsection}{\numberline {3.1}Stockage des mots avec holdall:}{6}{subsection.31}%
+\contentsline {paragraph}{Généralités:}{6}{section*.32}%
+\contentsline {subsubsection}{\numberline {3.1.1}Implémentation par LDSC:}{6}{subsubsection.33}%
+\contentsline {subsubsection}{\numberline {3.1.2}Implémentation par tableaux dynamiques:}{6}{subsubsection.34}%
+\contentsline {paragraph}{Conclusion:}{7}{section*.35}%
+\contentsline {section}{\numberline {4}Calcul de la distance de Jaccard}{7}{section.36}%
+\contentsline {paragraph}{Les paires distinctes:}{7}{section*.37}%
+\contentsline {paragraph}{Rappel sur la distance de Jaccard:}{7}{section*.44}%
+\contentsline {paragraph}{Calcul du cardinal de l'union}{7}{section*.45}%
+\contentsline {paragraph}{Calcul du cardinal de l'intersection}{8}{section*.46}%
+\contentsline {paragraph}{Calcul final:}{8}{section*.47}%
+\contentsline {section}{\numberline {5}Les difficultés rencontrées}{8}{section.48}%
+\contentsline {subsection}{\numberline {5.1}Tentative d'utilisation de getopt}{8}{subsection.49}%
+\contentsline {paragraph}{La bibliothèque getopt:}{8}{section*.50}%
+\contentsline {subsection}{\numberline {5.2}La fonction fscanf}{8}{subsection.51}%
+\contentsline {paragraph}{utilisation de fscanf:}{8}{section*.52}%
+\contentsline {section}{\numberline {6}Performances}{9}{section.53}%
+\contentsline {paragraph}{Analyse de quelques données:}{9}{section*.54}%
+\contentsline {subsection}{\numberline {6.1}Compléxité en espace}{9}{subsection.55}%
+\contentsline {subsection}{\numberline {6.2}Compléxité en temps}{9}{subsection.56}%
+\contentsline {section}{\numberline {7}Améliorations possibles}{9}{section.57}%

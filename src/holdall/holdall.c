@@ -3,7 +3,7 @@
 #include "holdall.h"
 #include <stdio.h>
 
-#define CAPACITY_MIN 2
+#define CAPACITY_MIN 65536
 #define CAPACITY_MUL 2
 
 struct holdall {
@@ -31,9 +31,6 @@ void holdall_dispose(holdall **haptr) {
   if (*haptr == nullptr) {
     return;
   }
-  for (size_t i = 0; i < (*haptr)->count; i += 1) {
-    free((*haptr)->aref[i]);
-  }
   free((*haptr)->aref);
   free(*haptr);
   *haptr = nullptr;
@@ -43,7 +40,7 @@ void holdall_dispose(holdall **haptr) {
 // dynamique doublée. Renvoie un pointeur nul en cas d'échec
 static void *double_capacity(holdall *ha) {
   void **new_array = realloc(ha->aref,
-        CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
+        CAPACITY_MUL * ha->cap * sizeof(void *));
   if (new_array == nullptr) {
     return nullptr;
   }
