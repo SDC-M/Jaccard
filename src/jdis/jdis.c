@@ -67,16 +67,15 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
     ++p;
     ++cptr;
   }
-  if (cptr > 0){
+  if (cptr > 0) {
     *p = '\0';
   }
   return c == EOF ? EOF : 0;
 }
 
-
 // stdin__to_file : En cas de succès renvoie une tête de lecture vers un fichier
 //  temporaire en mode lecture seule, en cas d'échec renvoie nullptr.
-static FILE* stdin__to_file () {
+static FILE *stdin__to_file() {
   FILE *p = tmpfile();
   if (p == nullptr) {
     fprintf(stderr, "*** Erreur lors de l'allocation pour l'entrée standart.");
@@ -93,28 +92,25 @@ static FILE* stdin__to_file () {
 
 // create__file : En cas de succès renvoie une tête de lecture du fichier ouvert
 //  en mode lecture seule de nom file_name, en cas d'échec renvoie nullptr.
-static FILE* create__file (char *file_name) {
+static FILE *create__file(char *file_name) {
   if (file_name == nullptr) {
-      return nullptr;
+    return nullptr;
   }
   FILE *p = fopen(file_name, "r");
   if (p == nullptr) {
-      return nullptr;
+    return nullptr;
   }
   return p;
 }
 
-bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
-  if (words == nullptr) {
-    return nullptr;
-  }
+bst *file_to_bst(char *file_name, int value_max, bool wp) {
   FILE *p = nullptr;
   if (strcmp(file_name, OPT_STDIN) == 0) {
-    if ((p = stdin__to_file()) == nullptr){
+    if ((p = stdin__to_file()) == nullptr) {
       return nullptr;
     }
-   } else {
-    if ((p = create__file(file_name)) == nullptr){
+  } else {
+    if ((p = create__file(file_name)) == nullptr) {
       return nullptr;
     }
   }
@@ -137,9 +133,7 @@ bst *file_to_bst(char *file_name, holdall *words, int value_max, bool wp) {
       bst_dispose(&bst_f);
       return nullptr;
     }
-    if (res == z) {
-      holdall_put(words, z);
-    } else {
+    if (res != z) {
       free(z);
     }
     r = hm__fscanf(p, value_max, x, wp);

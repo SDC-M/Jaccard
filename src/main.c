@@ -3,10 +3,8 @@
 #include <string.h>
 #include <assert.h>
 #include <locale.h>
-#include <getopt.h>
 
 #include "avl/bst.h"
-#include "holdall/holdall.h"
 #include "jdis/jdis.h"
 #include "op/op.h"
 
@@ -24,8 +22,10 @@
 #define SHORT_I "-i"
 #define SHORT_P "-p"
 
-int rfree(void *ptr) {
-  free(ptr);
+int rfree(void *ctx, const void *ref) {
+  if (ctx == nullptr) {
+  }
+  free((void *) ref);
   return 0;
 }
 
@@ -63,10 +63,15 @@ int main(int argc, char *argv[]) {
       ++nb_files;
     }
   }
-  holdall *words = holdall_empty();
+  if (nb_files < 2) {
+    fprintf(stderr, "*** Pas assez d'arguments.\n");
+    help();
+    free(filenames);
+    return EXIT_FAILURE;
+  }
   bst **tab = malloc((size_t) (nb_files) * sizeof(bst *));
   for (int i = 0; i < nb_files; ++i) {
-    tab[i] = file_to_bst(filenames[i], words, value_max, want_punc);
+    tab[i] = file_to_bst(filenames[i], value_max, want_punc);
     if (tab[i] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
           filenames[i]);
@@ -103,12 +108,12 @@ int main(int argc, char *argv[]) {
     }
   }
 dispose:
+  free(filenames);
   for (int i = 0; i < nb_files; ++i) {
+    bst_dft_infix_apply_context(tab[i], 0, nullptr, rfree, nullptr,
+        nullptr);
     bst_dispose(&tab[i]);
   }
-  holdall_apply(words, rfree);
-  holdall_dispose(&words);
   free(tab);
-  free(filenames);
   return EXIT_SUCCESS;
 }

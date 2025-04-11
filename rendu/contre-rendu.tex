@@ -10,6 +10,8 @@
 \usepackage{palatino}  % Police
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{colortbl}
+\usepackage{array}
 \usepackage[
 backend=biber,
 style=alphabetic,
@@ -117,15 +119,7 @@ de recherches equillibrés}, c'est la deuxième qui nous a paru la plus adéquat
 facile de représenter les arbres et nous avions beaucoup plus travailler sur cette notion en cours.
 
 \subsection{Les modules}
-Les modules utilisés sont:
-Les modules utilisés sont: \textbf{avl}, \textbf{holdall}, \textbf{jdis}, \textbf{op}.
-
-\paragraph{Le module holdall:}
- Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, afin de séparer 
-le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
-\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
-Nous avons égelment décider de tester cette solution en parallèle et nous en faisons référence dans
-la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
+Les modules utilisés sont: \textbf{avl}, \textbf{jdis}, \textbf{op}.
 
 \paragraph{Le module jdis:}
 Nous avons décider de créer un module spécifique pour gérer la liaison entre le module \textbf{avl}
@@ -323,9 +317,14 @@ d'où la création de la fonction statique \textbf{stdin\_\_to\_file} dans le mo
 
 \subsection{Stockage des mots avec holdall:}
 \paragraph{Généralités:}
+Dans un premier temps nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, 
+afin de séparer le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
+\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
+Nous avons égelment décider de tester cette solution en parallèle et nous en faisons référence dans
+la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
 Deux versions de ce module ont été réfléchis pendant la création de ce projet. La premiere en utilisant le 
 principe des listes dynamiques simplement chainées et la seconde en utilisant les tableaux dynamiques.
-\subsubsection{Implémentation par LDSC:}\label{subsec:impl}=
+\subsubsection{Implémentation par LDSC:}\label{subsec:impl}
 Pendant les cours d'algorithmique, nous avons étudié les listes dynamiques simplement chaînées (LDSC).
 Ce type de structure permet d'ajouter rapidement des éléments en tête de liste, en temps constant,
 ce qui est très avantageux en termes de performance. En effet, chaque ajout nécessite juste de créer
@@ -341,7 +340,8 @@ stocker les mots. Pour les petits fichiers cette implémentation s'est montré t
 le programme passait énormément de temps à recopier les données déjà présentes dans le tableau.
 
 \paragraph{Conclusion:}
-Nous avons décider de conserver le module avec les LDSC pour privillégier l'efficacité temporelle de notre exécutable.
+Nous avons finalement décider de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
+Néamoins nous avons réaliser une ptite étude sur une petit jeu de données afin de se rendre compte des différences.
 
 \section{Calcul de la distance de Jaccard}\label{subsec:jdis}
 \paragraph{Les paires distinctes:}
@@ -441,12 +441,75 @@ Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte
 \section{Performances}\label{sec:perf}
 \paragraph{Analyse de quelques données:}
 Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
-une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
-
-\subsection{Compléxité en espace}
-
-\subsection{Compléxité en temps}
-
+une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.\\\\
+\textbf{Avec le module holdall implémenté par LDSC:}
+\begin{center}
+\begin{tikzpicture}
+  \node[inner sep=0pt] (table) {
+  \small
+  \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
+  \hline
+  \rowcolor{gray!20}
+  \textbf{Fichiers} & \textbf{Tailles (MB)} & \textbf{Nombre de mots} & \textbf{Temps réel (s)} & \textbf{Allocations (bytes)} & \textbf{Distance de Jaccard} \\
+  \hline
+  abeeeillmrsss / lesmiserables.txt & 3.1 / 3.1 & 60242 / 60242 & 2.557 & 13062070 & 0 \\
+  \hline
+  tartuffe.txt / lesmiserables.txt & 0.1163 / 3.1 & 4804 / 60242 & 1.366 & 7002984 & 0.9474 \\
+  \hline
+  tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & 0.077 & 743102 & 0.7852 \\
+  \hline
+  fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & 1.165 & 23098730 & 0.9957 \\
+  \hline
+  \end{tabular}
+  };
+\end{tikzpicture}
+\end{center}
+\textbf{Avec le module holdall implémenté par tableaux dynamiques avec gestion préfixielle:}
+\begin{center}
+\begin{tikzpicture}
+  \node[inner sep=0pt] (table) {
+  \small
+  \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
+  \hline
+  \rowcolor{gray!20}
+  \textbf{Fichiers} & \textbf{Tailles (MB)} & \textbf{Nombre de mots} & \textbf{Temps réel (s)} & \textbf{Allocations (bytes)} & \textbf{Distance de Jaccard} \\
+  \hline
+  abeeeillmrsss / lesmiserables.txt & 3.1 / 3.1 & 60242 / 60242 & 38.538 & 12707198 & 0 \\
+  \hline
+  tartuffe.txt / lesmiserables.txt & 0.1163 / 3.1 & 4804 / 60242 & 11.679 & 6486544 & 0.9474 \\
+  \hline
+  tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & 0.287 & 1122454 & 0.7852 \\
+  \hline
+  fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & 96.309 & 25510530 & 0.9957 \\
+  \hline
+  \end{tabular}
+  };
+\end{tikzpicture}
+\end{center}
+\textbf{Sans le module holdall en libérant les ressources avec la fonction bst\_dft\_infix\_apply\_context du module avl:}
+\begin{center}
+\begin{tikzpicture}
+  \node[inner sep=0pt] (table) {
+  \small
+  \begin{tabular}{|>{\raggedright\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{2.5cm}|}
+  \hline
+  \rowcolor{gray!20}
+  \textbf{Fichiers} & \textbf{Tailles (MB)} & \textbf{Nombre de mots} & \textbf{Temps réel (s)} & \textbf{Allocations (bytes)} & \textbf{Distance de Jaccard} \\
+  \hline
+  abeeeillmrsss / lesmiserables.txt & 3.1 / 3.1 & 60242 / 60242 & 0.848 & 11134310 & 0 \\
+  \hline
+  tartuffe.txt / lesmiserables.txt & 0.1163 / 3.1 & 4804 / 60242 & 0.424 & 5962232 & 0.9474 \\
+  \hline
+  tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & 0.023 & 598142 & 0.7852 \\
+  \hline
+  fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & 0.393 & 17646186 & 0.9957 \\
+  \hline
+  \end{tabular}
+  };
+\end{tikzpicture}
+\end{center}
+\paragraph{Conclusion:}
+Il est évident que la version sans holdall est bien plus performante. 
 \section{Améliorations possibles}
 
 \end{document}
