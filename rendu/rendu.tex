@@ -484,6 +484,41 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
 \end{center}
 \paragraph{Conclusion:}
 Il est évident que la version sans holdall est bien plus performante. 
+
+\paragraph{\textbf{Précisions sur les résultats obtenus:}}
+
+\paragraph{Avec LDSC:} Comme nous pouvons le remarquer dans le premier tableau, les statistique temporelle sont relativement satisfaisantes 
+lorsque nous les comparons avec celles concernant une implémentation par tableaux dynamiques. Ce qui pose problème ici c'est le nombres d'allocation.
+En effet ce nombres est le plus élevé des trois implémentations ci-dessus. Ce qui est cohérent puisque nous allouons un cellules de liste qui contient
+\texttt{la référence} et un champs \texttt{next} pour chaque mots trouvé dans les fichiers.
+Nous pouvons donc l'améliorer en essayant de réduire le nombre d'allocations.
+
+\paragraph{Avec tableau dynamique:} Ce qui, à première vue, semblait une améliorations possibles de notre projets, c'est avérée la pire implémentation de
+celles proposées dans notre projets. Nous avions effectivement réduit le nombre d'allocations par rapport au LDSC, mais nous perdions un temps considérable
+à recopier le tableau dynamique lorsque celui-ci était trop petit. Comme nous pouvons le voir nous avons environ 39 secondes pour traiter les fichiers 
+\textbf{\texttt{abeeeillmrsss.txt}} et \textbf{\texttt{lesmiserables.txt}}. Nous ne pouvions pas rester sur cette implémentations.
+
+\paragraph{Sans module \texttt{Holdall:}} En effet supprimer totalement ce module permettrais de supprimer beacoup d'allocations et donc de gagner du temps.
+De plus nous stockons déjà toutes les références des mots dans les "AVL fichiers", nous avons donc utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context}
+pour nous permettres de parcourir tous les AVL et ainsi libérer les références. Et cette méthode c'est avérée la meilleure au vu des résultats. Avec les mêmes 
+textes cités précédemment nous avons pu divisé le temps par 45 par rapport à l'implémentation par tableau dynamique, et environ 2M d'octets de gagnés 
+par rapport au LDSC.
+
 \section{Améliorations possibles}
+
+\paragraph{Une implémentation totalement différentes:} Nous avons remarqué grâce à l'executable fourni sur universitice 
+que nous pouvions faire bien mieux en utilisant les tables de hachages. En effet, en utilisant une table de hachage qui contiendrait
+tous les mots distincts en temps que clés et l'appartenance dans les les fichiers en tant que valeurs, nous aurions eu besoin d'allouer 
+seulement la table de hachages; là où, pour notre projet, nous avions besoin d'un AVL par fichiers et également un AVL d'union totale 
+pour l'affichage du graphe lorsque celui-ci est demandé. Nous perdons beaucoup de temps à allouer les ressources nécessaire. 
+
+\paragraph{N'allouer qu'une seule fois les références:} Un autre problème de notre implémentation c'est vu qu'on créer un AVL par fichier
+ce qui cause plusieurs allocation d'un même mots lorsque celui-ci existe dans plusieurs fichiers. La solution serait de stocker des pointeurs
+vers les références, qui elles sont uniques, dans les AVL. Nous avions déjà pensé à cette solution avant mais ne pouvions pas le coder vu 
+les restrictions donné dans le sujet, c'est-à-dire: 
+\begin{center}
+  \textbf{"vous utiliserez nécessairement soit l’en-tête \texttt{hashtable.h}, soit
+  l’en-tête \texttt{bst.h}, \underline{sans les modifier}"}
+\end{center}
 
 \end{document}
