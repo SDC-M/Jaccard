@@ -514,7 +514,7 @@ Nous pouvons donc l'améliorer en essayant de réduire le nombre d'allocations.
 
 \paragraph{Par tableaux dynamiques :} Ce qui, à première vue, semblait une amélioration possible de notre projet, c'est avérée la pire implémentation de
 celles proposées dans notre projet. Nous avions effectivement réduit le nombre d'allocations par rapport au LDSC, mais nous perdions un temps considérable
-à recopier le tableau dynamique lorsque celui-ci était trop petit. Comme nous pouvons le voir nous avons environ 39 secondes pour traiter les fichiers 
+à recopier le tableau dynamique lorsque celui-ci était trop petit. Comme nous pouvons le voir nous avons environ 39 secondes pour traiter les fichiers\\
 \textbf{\texttt{abeeeillmrsss.txt}} et \textbf{\texttt{lesmiserables.txt}}. Nous ne pouvions pas rester sur cette implémentation.
 
 \paragraph{Sans module \texttt{Holdall:}} En effet supprimer totalement ce module permettrais de supprimer beaucoup d'allocations et donc de gagner du temps.
