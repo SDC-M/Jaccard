@@ -5,7 +5,8 @@
 #include <ctype.h>
 #include "jdis.h"
 
-#define WORD_MAX_SIZE 50
+#define WORD_INIT_SIZE 63
+#define MULT_COEFF 2
 
 #define OPT_STDIN "-"
 
@@ -49,9 +50,10 @@ double jdis(bst *p, bst *q, size_t card_interction) {
 //  value_max caractères, stocke dans la zone pointée par buffer et si wp est à
 //  vrai alors gère la ponctuation comme séparateur, en cas de succès renvoie 0
 //  sinon EOF.
-static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
+static int hm__fscanf(FILE *stream, int value_max, char **buffer, bool wp,
+    bool wc) {
   int c;
-  char *p = buffer;
+  char *p = *buffer;
   int cptr = 0;
   while ((c = fgetc(stream)) != EOF) {
     if (wp && ispunct(c)) {
@@ -60,8 +62,18 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
     if (isspace(c)) {
       break;
     }
-    if (cptr >= value_max) {
-      continue;
+    if (cptr == value_max) {
+      if (wc) {
+        continue;
+      } else {
+        value_max *= MULT_COEFF;
+        *buffer = realloc(*buffer, (size_t) (value_max + 1));
+        if (*buffer == nullptr) {
+          free(*buffer);
+          return EOF;
+        }
+        p = *buffer + cptr;
+      }
     }
     *p = (char) c;
     ++p;
@@ -70,7 +82,10 @@ static int hm__fscanf(FILE *stream, int value_max, char *buffer, bool wp) {
   if (cptr > 0) {
     *p = '\0';
   }
-  return c == EOF ? EOF : 0;
+  if (feof(stream) != 0) {
+    return EOF;
+  }
+  return 0;
 }
 
 // create__file : En cas de succès renvoie une tête de lecture du fichier ouvert
@@ -95,21 +110,37 @@ bst *file_to_bst(char *file_name, int value_max, bool wp) {
       return nullptr;
     }
   }
-  if (value_max == 0) {
-    value_max = WORD_MAX_SIZE;
-  }
-  char x[value_max + 1];
   bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (bst_f == nullptr) {
     fclose(p);
     return nullptr;
   }
-  int r = hm__fscanf(p, value_max, x, wp);
+  bool wc = false;
+  if (value_max == 0) {
+    value_max = WORD_INIT_SIZE;
+  } else {
+    wc = true;
+  }
+  char *x = malloc((size_t) (value_max + 1));
+  if (x == nullptr) {
+    fclose(p);
+    bst_dispose(&bst_f);
+    return nullptr;
+  }
+  int r = hm__fscanf(p, value_max, &x, wp, wc);
   while (r != EOF) {
     char *z = malloc(strlen(x) + 1);
+    if (z == nullptr) {
+      free(x);
+      fclose(p);
+      bst_dispose(&bst_f);
+      return nullptr;
+    }
     strcpy(z, x);
     char *res;
     if ((res = bst_add_endofpath(bst_f, z)) == nullptr) {
+      free(z);
+      free(x);
       fclose(p);
       bst_dispose(&bst_f);
       return nullptr;
@@ -117,8 +148,9 @@ bst *file_to_bst(char *file_name, int value_max, bool wp) {
     if (res != z) {
       free(z);
     }
-    r = hm__fscanf(p, value_max, x, wp);
+    r = hm__fscanf(p, value_max, &x, wp, wc);
   }
+  free(x);
   fclose(p);
   return bst_f;
 }
