@@ -6,6 +6,7 @@
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
+#include "holdall/holdall.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
@@ -132,8 +133,12 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
   bst **tab = malloc((size_t) (nb_files) * sizeof(bst *));
+  if (tab == nullptr) {
+    goto dispose;
+  }
+  holdall *words = holdall_empty();
   for (int i = 0; i < nb_files; ++i) {
-    tab[i] = file_to_bst(filenames[i], value_max, want_punc);
+    tab[i] = file_to_bst(filenames[i], value_max, want_punc, words);
     if (tab[i] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
           filenames[i]);
@@ -177,5 +182,6 @@ dispose:
     bst_dispose(&tab[i]);
   }
   free(tab);
+  holdall_dispose(&words);
   return EXIT_SUCCESS;
 }
