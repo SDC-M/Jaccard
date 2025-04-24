@@ -41,7 +41,7 @@ style=alphabetic,
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 14 Avril 2025};
+        Version du 24 Avril 2025};
   \end{tikzpicture}
 }
 
@@ -158,7 +158,8 @@ Celle-ci va utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du mod
 \paragraph{L'option -iVALUE / --initial=VALUE :}
 Cette option permet de fixer la taille des mots à \textbf{VALUE}.
 Celle-ci est traitée au moment de la lecture des mots et permet de signaler qu'il faut ignorer tous les caractères dépassant cette
-limite jusqu'au prochain caractère de séparation (voir \textbf{\ref{subsec:fscanf}}).
+limite jusqu'au prochain caractère de séparation (voir \textbf{\ref{subsec:fscanf}}). À savoir que par défaut il n'y a pas de limite en
+tant que telle, la taille maximale d'un mot sera alors ULONG\_MAX ce qui est plus que raisonnable.
 
 \paragraph{L'option -p / --punctuation-like-space :}
 Cette option permet d'indiquer à la fonction de lecture que les caractères de ponctuation de la classe \texttt{isspace} et \texttt{ispunct}

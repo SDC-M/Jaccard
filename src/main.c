@@ -65,9 +65,12 @@ static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
   for (int i = 0; i < ctx->nb_bst; ++i) {
     if (bst_search(ctx->t[i], ref) != nullptr) {
-      fprintf(stdout, "x\t");
+      fprintf(stdout, "x");
     } else {
-      fprintf(stdout, "-\t");
+      fprintf(stdout, "-");
+    }
+    if (i != ctx->nb_bst - 1){
+        fprintf(stdout, "\t");
     }
   }
   printf("\n");
@@ -95,7 +98,10 @@ int rfree(void *ctx, const void *ref) {
 }
 
 int main(int argc, char *argv[]) {
-  setlocale(LC_ALL, "");
+  if (setlocale(LC_COLLATE, "") == nullptr){
+    printf("*** Erreur lors de la mise à jour de la locale\n");
+    return EXIT_FAILURE;
+  }
   bool graph = false;
   bool escaped_file = false;
   size_t value_max = 0;
@@ -174,7 +180,7 @@ int main(int argc, char *argv[]) {
       for (int j = i + 1; j < nb_files; ++j) {
         size_t card_in = card_intersection(tab[i], tab[j]);
         double jaccard_distance = jdis(tab[i], tab[j], card_in);
-        printf("%s\t%s: %.4lf\n", filenames[i], filenames[j], jaccard_distance);
+        printf("%.4lf\t%s %s\n",jaccard_distance, filenames[i], filenames[j]);
       }
     }
   }
