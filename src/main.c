@@ -5,6 +5,7 @@
 #include <locale.h>
 #include <limits.h>
 
+
 #include "avl/bst.h"
 #include "jdis/jdis.h"
 
@@ -125,7 +126,7 @@ int main(int argc, char *argv[]) {
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
       value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL, nullptr, 10);
       if (value_max == ULONG_MAX) {
-        fprintf(stderr, "*** Too high value\n");
+        fprintf(stderr, "*** Valeur de limite trop élevée\n");
         goto dispose_err_val_max;
       }
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {

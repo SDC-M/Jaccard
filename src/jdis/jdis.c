@@ -83,7 +83,7 @@ static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
     *p = '\0';
   }
   if (cptr >= value_max || cptr >= WORD_INIT_SIZE){
-    fprintf(stderr, "***Word \" %s...\" has been cut\n", *buffer);
+    fprintf(stderr, "***Le mot \" %s...\" à peut-être été coupé\n", *buffer);
   }
   if (feof(stream) != 0) {
     return EOF;
