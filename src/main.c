@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   setlocale(LC_ALL, "");
   bool graph = false;
   bool escaped_file = false;
-  int value_max = 0;
+  size_t value_max = 0;
   bool want_punc = false;
   int nb_files = 0;
   char **filenames = malloc((size_t) argc * sizeof(char *));
@@ -115,9 +115,9 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], SHORT_G) == 0 || strcmp(argv[i], LONG_G) == 0) {
       graph = true;
     } else if (strstr(argv[i], LONG_I) != nullptr) {
-      value_max = atoi(argv[i] + LEN_LONG_OPT_INITIAL);
+      value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL,nullptr , 10);
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
-      value_max = atoi(argv[i] + LEN_SHORT_OPT_INITIAL);
+      value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL,nullptr , 10);
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
