@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
   bst *uni_words = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (uni_words == nullptr) {
     fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
-    goto dispose;
+    goto dispose2;
   }
   for (int i = 0; i < nb_files; ++i) {
     tab[i] = file_to_bst(filenames[i], value_max, want_punc, uni_words);
@@ -167,14 +167,15 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-dispose:
-  free(filenames);
+dispose2:
   for (int i = 0; i < nb_files; ++i) {
     bst_dispose(&tab[i]);
   }
   bst_dft_infix_apply_context(uni_words, 0, nullptr, rfree, nullptr,
     nullptr);
   bst_dispose(&uni_words);
+dispose:
+  free(filenames);
   free(tab);
   return EXIT_SUCCESS;
 }
