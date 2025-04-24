@@ -119,14 +119,14 @@ int main(int argc, char *argv[]) {
     } else if (strstr(argv[i], LONG_I) != nullptr) {
       value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL, nullptr, 10);
       if (value_max == ULONG_MAX) {
-        fprintf(stderr, "*** Too high value ==> changing to default\n");
-        value_max = WORD_INIT_SIZE;
+        fprintf(stderr, "*** Too high value\n");
+        goto dispose_err_val_max;
       }
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
       value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL, nullptr, 10);
       if (value_max == ULONG_MAX) {
-        fprintf(stderr, "*** Too high value ==> changing to default\n");
-        value_max = WORD_INIT_SIZE;
+        fprintf(stderr, "*** Too high value\n");
+        goto dispose_err_val_max;
       }
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
@@ -185,7 +185,8 @@ dispose2:
       nullptr);
   bst_dispose(&uni_words);
 dispose:
-  free(filenames);
   free(tab);
+dispose_err_val_max:
+  free(filenames);
   return EXIT_SUCCESS;
 }
