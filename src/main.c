@@ -3,12 +3,14 @@
 #include <string.h>
 #include <assert.h>
 #include <locale.h>
+#include <limits.h>
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
+#define WORD_INIT_SIZE 63
 
 #define LONG_G "--graph"
 #define LONG_H "--help"
@@ -115,9 +117,17 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], SHORT_G) == 0 || strcmp(argv[i], LONG_G) == 0) {
       graph = true;
     } else if (strstr(argv[i], LONG_I) != nullptr) {
-      value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL,nullptr , 10);
+      value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL, nullptr, 10);
+      if (value_max == ULONG_MAX) {
+        fprintf(stderr, "*** Too high value ==> changing to default\n");
+        value_max = WORD_INIT_SIZE;
+      }
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
-      value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL,nullptr , 10);
+      value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL, nullptr, 10);
+      if (value_max == ULONG_MAX) {
+        fprintf(stderr, "*** Too high value ==> changing to default\n");
+        value_max = WORD_INIT_SIZE;
+      }
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
@@ -172,7 +182,7 @@ dispose2:
     bst_dispose(&tab[i]);
   }
   bst_dft_infix_apply_context(uni_words, 0, nullptr, rfree, nullptr,
-    nullptr);
+      nullptr);
   bst_dispose(&uni_words);
 dispose:
   free(filenames);
