@@ -176,15 +176,17 @@ Cette dernière option permet de rentrer des mots sur l'entrée standard pour qu
 \subsection{Gestions des fichiers}\label{subsec:files}
 Pour gérer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
 associé en mode lecture seule puis nous lisons (précisions \textbf{\ref{subsec:fscanf}}) chaque
-mot et nous tentons de l'ajouter à l'arbre binaire associé. À la fin de la lecture, nous avons
-un arbre contenant des pointeurs vers les mots. Il est à noté que pour un même fichier, on stocke
-en un et un seul exemplaire les mots apparaissant plusieurs fois dans le même fichier. Nous avons un
-tableau avec l'ensemble des arbres créer.
+mot et nous tentons de l'ajouter à l'arbre binaire de recherche représentant l'union, si le mot est
+déjà dedans nous libérons l'éspace mémoire associé au mot puis nous ajoutons la référence à l'arbre 
+binaire de recherche associé au fichier dans tous les cas. À la fin de la lecture, nous avons
+un arbre contenant des pointeurs vers les mots eux-mêmes contenus dans l'arbre des unions.
+Il est donc à noté que pour l'ensemble des mots traités nous n'avons pas de doublons 
 
 \paragraph{Exemple :}
 Ainsi si nous exécutons la commande suivante : \colorbox{lightgray!20}{\textit{./jdis x0.txt x1.txt x2.txt}}
 où les fichiers x0.txt et x1.txt sont ceux donnés dans le sujet du projet, nous aurons la représentation
 suivante :
+À REFAIRE
 \begin{center}
   \begin{tikzpicture}
     \node (case1) at (0, 0) [rectangle, draw, minimum width=1cm, minimum height=3cm] {x2.txt};
@@ -394,9 +396,9 @@ la distance de Jaccard entre les deux ensembles de mots de la paire de fichiers.
 \subsection{Tentative d'utilisation de getopt}
 \paragraph{La bibliothèque getopt :} 
 En premier lieu nous nous sommes intéressés à la bibliothèque getopt qui nous permettait de parser 
-la ligne de commande pour trouver les options notamment grâce à \textbf{optind} et \textbf{optarg}. Nous pouvions également préciser 
-quelles options nécessitaient des paramètres comme pour l'option qui permet de fixer la taille 
-maximale des mots \textbf{-iVALUE} ou \textbf{--initial=VALUE}. Grâce à \textbf{getopt}
+la ligne de commande pour trouver les options notamment grâce à \textbf{optind} et \textbf{optarg}. 
+Nous pouvions également préciser quelles options nécessitaient des paramètres comme pour l'option qui
+permet de fixer la taille maximale des mots \textbf{-iVALUE} ou \textbf{--initial=VALUE}. Grâce à \textbf{getopt}
 nous avons pu implanter les options très rapidement, mais nous avons rencontré un problème 
 lorsque nous voulions implanter l'option '--' permettant d'échapper le nom d'un fichier.
 En effet, lorsque nous utilisions cette option, nous avons remarqué quelle échappait tous les 
@@ -414,13 +416,14 @@ analyser une deuxième fois le buffer que nous prenions afin de l'analyser par l
 deux fois et donc de doubler la compléxité temporelle. Il a été alors naturellement convenu de coder notre propre
 fonction de lecture  d'où l'apparition de la fonction statique \textbf{hm\_\_fscanf} (hm pour home maid). Ainsi nous lisons
 caractère par caractère dans le fichier donné par la tête de lecture en paramètre grâce à la fonction \textbf{fgetc}.
-Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non.
+Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non ainsi que la découpe des mots.
 
 \section{Performances}\label{sec:perf}
 \paragraph{Analyse de quelques données :}
 Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
-une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.\\\\
-\textbf{Avec le module holdall implémenté par LDSC:}
+une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
+\newpage{}
+\textbf{Avec le module holdall implémenté par LDSC: (À REFAIRE SUR LES MACHINES DE LA FAC )}
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
@@ -520,25 +523,14 @@ celles proposées dans notre projet. Nous avions effectivement réduit le nombre
 
 \paragraph{Sans module \texttt{Holdall:}} En effet supprimer totalement ce module permettrais de supprimer beaucoup d'allocations et donc de gagner du temps.
 De plus nous stockons déjà toutes les références des mots dans les "AVL fichiers", nous avons donc utilisé la fonction \textbf{bst\_dft\_infix\_apply\_context}
-pour nous permettre de parcourir tous les AVL et ainsi libérer les références. Et cette méthode, c'est avérée la meilleure au vu des résultats. Avec les mêmes 
-textes cités précédemment nous avons pu diviser le temps par 45 par rapport à l'implémentation par tableau dynamique, et environ 2M d'octets de gagnés 
-par rapport au LDSC.
+pour nous permettre de parcourir l'arbre "union" et ainsi libérer les références. Et cette méthode, c'est avérée la meilleure au vu des résultats.
 
 \section{Améliorations possibles}
 
 \paragraph{Une implémentation totalement différente :} Nous avons remarqué grâce à l'exécutable fourni sur universitice 
 que nous pouvions faire bien mieux en utilisant les tables de hachages. En effet, en utilisant une table de hachage qui contiendrait
 tous les mots distincts en tant que clés et l'appartenance dans les fichiers en tant que valeurs, nous aurions eu besoin d'allouer 
-seulement la table de hachage ; là où, pour notre projet, nous avions besoin d'un AVL par fichiers et également un AVL d'union totale 
-pour l'affichage du graphe lorsque celui-ci est demandé. Nous perdons donc beaucoup de temps à allouer les ressources nécessaires. 
-
-\paragraph{N'allouer qu'une seule fois les références :} Un autre problème de notre implémentation, c'est vu qu'on créér un AVL par fichier
-ce qui cause plusieurs allocations d'un même mot lorsque celui-ci existe dans plusieurs fichiers. La solution serait de stocker des pointeurs
-vers les références, qui elles sont uniques, dans les AVL. Nous avions déjà pensé à cette solution avant mais ne pouvions pas le coder vu 
-les restrictions données dans le sujet, c'est-à-dire : 
-\begin{center}
-  \textbf{"vous utiliserez nécessairement soit l’en-tête \texttt{hashtable.h}, soit
-  l’en-tête \texttt{bst.h}, \underline{sans les modifier}"}
-\end{center}
+seulement la table de hachage ; là où, pour notre projet, nous avions besoin d'un AVL par fichiers et également un AVL d'union totale. 
+Nous perdons donc beaucoup de temps à allouer les ressources nécessaires. 
 
 \end{document}
