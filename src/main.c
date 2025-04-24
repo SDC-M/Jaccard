@@ -6,7 +6,6 @@
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
-#include "holdall/holdall.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
@@ -136,9 +135,13 @@ int main(int argc, char *argv[]) {
   if (tab == nullptr) {
     goto dispose;
   }
-  holdall *words = holdall_empty();
+  bst *uni_words = bst_empty((int (*)(const void *, const void *)) strcoll);
+  if (uni_words == nullptr) {
+    fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
+    goto dispose;
+  }
   for (int i = 0; i < nb_files; ++i) {
-    tab[i] = file_to_bst(filenames[i], value_max, want_punc, words);
+    tab[i] = file_to_bst(filenames[i], value_max, want_punc, uni_words);
     if (tab[i] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
           filenames[i]);
@@ -150,21 +153,11 @@ int main(int argc, char *argv[]) {
     }
   }
   if (graph) {
-    bst *uni = bst_empty((int (*)(const void *, const void *)) strcoll);
-    if (uni == nullptr) {
-      fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
-      goto dispose;
-    }
-    for (int i = 0; i < nb_files; ++i) {
-      bst_dft_infix_apply_context(tab[i], 0, uni,
-          (int (*)(void *, const void *)) add_element, nullptr, nullptr);
-    }
     for (int i = 0; i < nb_files; ++i) {
       printf("\t%s", filenames[i]);
     }
     printf("\n");
-    graph_belonging(tab, uni, nb_files);
-    bst_dispose(&uni);
+    graph_belonging(tab, uni_words, nb_files);
   } else {
     for (int i = 0; i < nb_files - 1; ++i) {
       for (int j = i + 1; j < nb_files; ++j) {
@@ -177,11 +170,11 @@ int main(int argc, char *argv[]) {
 dispose:
   free(filenames);
   for (int i = 0; i < nb_files; ++i) {
-    bst_dft_infix_apply_context(tab[i], 0, nullptr, rfree, nullptr,
-        nullptr);
     bst_dispose(&tab[i]);
   }
+  bst_dft_infix_apply_context(uni_words, 0, nullptr, rfree, nullptr,
+    nullptr);
+  bst_dispose(&uni_words);
   free(tab);
-  holdall_dispose(&words);
   return EXIT_SUCCESS;
 }

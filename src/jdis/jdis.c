@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <ctype.h>
 #include "jdis.h"
-#include "../holdall/holdall.h"
 
 #define WORD_INIT_SIZE 63
 #define MULT_COEFF 2
@@ -86,7 +85,7 @@ static int hm__fscanf(FILE *stream, int value_max, char **buffer, bool wp,
   if (feof(stream) != 0) {
     return EOF;
   }
-  return 0;
+  return c == EOF ? EOF : 0;
 }
 
 // create__file : En cas de succès renvoie une tête de lecture du fichier ouvert
@@ -102,12 +101,13 @@ static FILE *create__file(char *file_name) {
   return p;
 }
 
-bst *file_to_bst(char *file_name, int value_max, bool wp, holdall *words) {
-  if (words == nullptr) {
+bst *file_to_bst(char *file_name, int value_max, bool wp, bst *uni_words) {
+  if (uni_words == nullptr) {
     return nullptr;
   }
   FILE *p = nullptr;
   if (strcmp(file_name, OPT_STDIN) == 0) {
+    rewind(stdin);
     p = stdin;
   } else {
     if ((p = create__file(file_name)) == nullptr) {
@@ -133,29 +133,28 @@ bst *file_to_bst(char *file_name, int value_max, bool wp, holdall *words) {
   }
   int r = hm__fscanf(p, value_max, &x, wp, wc);
   while (r != EOF) {
-    char *z = malloc(strlen(x) + 1);
-    if (z == nullptr) {
-      free(x);
-      fclose(p);
-      bst_dispose(&bst_f);
+    char *y = malloc(strlen(x) + 1);
+    strcpy(y, x);
+    char *retour_add_uni = bst_add_endofpath(uni_words, y);
+    if (retour_add_uni == nullptr) {
       return nullptr;
     }
-    strcpy(z, x);
     char *res;
-    if ((res = bst_add_endofpath(bst_f, z)) == nullptr) {
-      free(z);
+    if ((res = bst_add_endofpath(bst_f, retour_add_uni)) == nullptr) {
       free(x);
       fclose(p);
       bst_dispose(&bst_f);
       return nullptr;
     }
-    if (res != z) {
-      free(z);
+    if (y != retour_add_uni) {
+      free(y);
     }
     r = hm__fscanf(p, value_max, &x, wp, wc);
   }
   free(x);
-  fclose(p);
+  if (p != stdin) {
+    fclose(p);
+  }
   return bst_f;
 }
 
