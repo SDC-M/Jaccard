@@ -136,8 +136,12 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   }
   int r = hm__fscanf(p, value_max, &x, wp, wc);
   while (r != EOF) {
-    char *y = malloc(strlen(x) + 1);
-    strcpy(y, x);
+    char *is_in = bst_search(uni_words, x);
+    char *y = x;
+    if (is_in == nullptr){
+      y = malloc(strlen(x) + 1);
+      strcpy(y, x);
+    }
     char *retour_add_uni = bst_add_endofpath(uni_words, y);
     if (retour_add_uni == nullptr) {
       return nullptr;
@@ -148,9 +152,6 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
       fclose(p);
       bst_dispose(&bst_f);
       return nullptr;
-    }
-    if (y != retour_add_uni) {
-      free(y);
     }
     r = hm__fscanf(p, value_max, &x, wp, wc);
   }
