@@ -82,8 +82,8 @@ static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
   if (cptr > 0) {
     *p = '\0';
   }
-  if (cptr >= value_max || cptr >= WORD_INIT_SIZE){
-    fprintf(stderr, "***Le mot \" %s...\" à peut-être été coupé\n", *buffer);
+  if (cptr >= value_max || (cptr >= WORD_INIT_SIZE && wc)){
+    fprintf(stderr, "***Le mot \" %s...\" a été coupé\n", *buffer);
   }
   if (feof(stream) != 0) {
     return EOF;
@@ -110,7 +110,9 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   }
   FILE *p = nullptr;
   if (strcmp(file_name, OPT_STDIN) == 0) {
-    rewind(stdin);
+    if (rewind(stdin) != 0){
+      return nullptr;
+    }
     p = stdin;
   } else {
     if ((p = create__file(file_name)) == nullptr) {
@@ -157,7 +159,9 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   }
   free(x);
   if (p != stdin) {
-    fclose(p);
+    if (fclose(p) == EOF){
+      return nullptr;
+    }
   }
   return bst_f;
 }
