@@ -171,7 +171,11 @@ int main(int argc, char *argv[]) {
   }
   if (graph) {
     for (int i = 0; i < nb_files; ++i) {
-      printf("\t%s", filenames[i]);
+      if (strcmp(filenames[i], "-") == 0){
+          printf("\t\"\"");
+      } else {
+        printf("\t%s", filenames[i]);
+      }
     }
     printf("\n");
     graph_belonging(tab, uni_words, nb_files);
@@ -180,7 +184,17 @@ int main(int argc, char *argv[]) {
       for (int j = i + 1; j < nb_files; ++j) {
         size_t card_in = card_intersection(tab[i], tab[j]);
         double jaccard_distance = jdis(tab[i], tab[j], card_in);
-        printf("%.4lf\t%s\t%s\n",jaccard_distance, filenames[i], filenames[j]);
+        printf("%.4lf\t",jaccard_distance);
+        if (strcmp(filenames[i], "-") == 0){
+          printf("\"\"\t");
+        } else {
+          printf("%s\t", filenames[i]);
+        }
+        if (strcmp(filenames[j], "-") == 0){
+          printf("\"\"\n");
+        } else {
+          printf("%s\n", filenames[j]);
+        }
       }
     }
   }
