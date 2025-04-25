@@ -110,9 +110,7 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   }
   FILE *p = nullptr;
   if (strcmp(file_name, OPT_STDIN) == 0) {
-    if (rewind(stdin) != 0){
-      return nullptr;
-    }
+    rewind(stdin);
     p = stdin;
   } else {
     if ((p = create__file(file_name)) == nullptr) {

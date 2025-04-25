@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
   size_t value_max = 0;
   bool want_punc = false;
   int nb_files = 0;
-  char **filenames = malloc((size_t) argc * sizeof(char *));
+  char **filenames = malloc((size_t) argc);
   if (filenames == nullptr) {
     printf("*** Erreur d'allocation du tableau des noms de fichiers\n");
     return EXIT_FAILURE;
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
       for (int j = i + 1; j < nb_files; ++j) {
         size_t card_in = card_intersection(tab[i], tab[j]);
         double jaccard_distance = jdis(tab[i], tab[j], card_in);
-        printf("%.4lf\t%s %s\n",jaccard_distance, filenames[i], filenames[j]);
+        printf("%.4lf\t%s\t%s\n",jaccard_distance, filenames[i], filenames[j]);
       }
     }
   }
