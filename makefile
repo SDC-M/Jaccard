@@ -26,8 +26,9 @@ $(makefile_indicator): makefile
 
 archive:
 	tar -cvf ../projet.tar \
-		--exclude='jdis' \
 		--exclude='.git' \
 		--exclude='.gitignore' \
 		--exclude='./.#makefile#' \
+		--exclude='textes' \
+		--exclude='README.md' \
 		.
