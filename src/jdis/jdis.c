@@ -163,7 +163,3 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   }
   return bst_f;
 }
-
-int add_element(bst *t, const void *ref) {
-  return (bst_add_endofpath(t, ref) == nullptr) ? 1 : 0;
-}

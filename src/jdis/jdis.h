@@ -27,8 +27,3 @@ extern double jdis(bst *p, bst *q, size_t card_interction);
 //  sont des pointeurs null, retourne nullptr.
 extern bst *file_to_bst(char *file_name, size_t value_max, bool wp,
     bst *uni_words);
-
-// add_element : Renvoie une valeur nulle si l'ajout en bout de chemin de ref
-// dans l'arbre binaire de recherche associé à t se passe correctement. Renvoie
-// une valeur différente de nulle sinon
-extern int add_element(bst *t, const void *ref);
