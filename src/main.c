@@ -5,7 +5,6 @@
 #include <locale.h>
 #include <limits.h>
 
-
 #include "avl/bst.h"
 #include "jdis/jdis.h"
 
@@ -69,8 +68,8 @@ static int scptr_display(context *ctx, const char *ref) {
     } else {
       fprintf(stdout, "-");
     }
-    if (i != ctx->nb_bst - 1){
-        fprintf(stdout, "\t");
+    if (i != ctx->nb_bst - 1) {
+      fprintf(stdout, "\t");
     }
   }
   printf("\n");
@@ -98,7 +97,7 @@ int rfree(void *ctx, const void *ref) {
 }
 
 int main(int argc, char *argv[]) {
-  if (setlocale(LC_COLLATE, "") == nullptr){
+  if (setlocale(LC_COLLATE, "") == nullptr) {
     printf("*** Erreur lors de la mise à jour de la locale\n");
     return EXIT_FAILURE;
   }
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
   size_t value_max = 0;
   bool want_punc = false;
   int nb_files = 0;
-  char **filenames = malloc((size_t) argc);
+  char **filenames = malloc((size_t) argc * sizeof(char *));
   if (filenames == nullptr) {
     printf("*** Erreur d'allocation du tableau des noms de fichiers\n");
     return EXIT_FAILURE;
@@ -171,8 +170,8 @@ int main(int argc, char *argv[]) {
   }
   if (graph) {
     for (int i = 0; i < nb_files; ++i) {
-      if (strcmp(filenames[i], "-") == 0){
-          printf("\t\"\"");
+      if (strcmp(filenames[i], "-") == 0) {
+        printf("\t\"\"");
       } else {
         printf("\t%s", filenames[i]);
       }
@@ -184,13 +183,13 @@ int main(int argc, char *argv[]) {
       for (int j = i + 1; j < nb_files; ++j) {
         size_t card_in = card_intersection(tab[i], tab[j]);
         double jaccard_distance = jdis(tab[i], tab[j], card_in);
-        printf("%.4lf\t",jaccard_distance);
-        if (strcmp(filenames[i], "-") == 0){
+        printf("%.4lf\t", jaccard_distance);
+        if (strcmp(filenames[i], "-") == 0) {
           printf("\"\"\t");
         } else {
           printf("%s\t", filenames[i]);
         }
-        if (strcmp(filenames[j], "-") == 0){
+        if (strcmp(filenames[j], "-") == 0) {
           printf("\"\"\n");
         } else {
           printf("%s\n", filenames[j]);

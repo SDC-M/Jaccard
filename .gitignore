@@ -1,4 +1,6 @@
 jdis
+jdis_prof
+tests.sh
 .#makefile#
 textes/
 rendu/rendu.aux
