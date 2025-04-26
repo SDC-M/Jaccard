@@ -41,7 +41,7 @@ style=alphabetic,
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 24 Avril 2025};
+        Version du 26 Avril 2025};
   \end{tikzpicture}
 }
 
@@ -240,12 +240,13 @@ Nous aurons donc la représentation suivante en mémoire :
 
     \draw[->, color=red, bend left=5, dashed] (-7.5, -10.5) to (case5);
     \draw[->, color=red, bend right=10, dashed] (-7.5, -12.5) to (case6);
-    \draw[->, color=red, bend left=10, dashed] (-6.5, -15.5) to (case7);
-    \draw[->, color=red, bend left=5, dashed] (-5.5, -10.5) to (case4);
-    \draw[->, color=red, dashed] (-4, -17.5) to (case8);
-    \draw[->, color=red, bend left=5, dashed] (-3, -12.5) to (case12);
-    \draw[->, color=red, bend left=5, dashed] (-1.75, -15.5) to (case11);
+    \draw[->, color=red, bend left=10, dashed] (-6, -15.5) to (case7);
+    \draw[->, color=red, bend left=5, dashed] (-6.5, -10.5) to (case4);
+    \draw[->, color=red, dashed] (-3.75, -17.5) to (case8);
+    \draw[->, color=red, bend left=5, dashed] (-2.75, -12.5) to (case12);
+    \draw[->, color=red, bend left=5, dashed] (-1.5, -15.5) to (case11);
     \draw[->, color=red, bend right=10, dashed] (-0.3, -12.5) to (case9);
+    \draw[->, color=red, bend right=10, dashed] (-5, -12.5) to (case10);
 
     \node at (-11.5, -16) {\textbf{\textcolor{red}{char *}}};
     \draw[->, color=red, , dashed] (-12, -16.5) -- (-10, -16.5);
@@ -321,16 +322,15 @@ Nous aurons donc la représentation suivante en mémoire :
         level 2/.style={sibling distance=40mm},
         level 3/.style={sibling distance=20mm}
       ]
-        \node{@d}[rotate=180] 
+        \node{@d}[rotate=180]
           child { node{@b}
             child { node {@a}[rotate=180]  }
             child { node {@c}[rotate=180]  }
           }
           child { node {@f} 
-            child { node {@e}
-              child { node {@g} }
-            }
+            child { node {@e} }
             child { node {@h} 
+              child { node {@g} }
               child { node {@z}}
             }
           };
@@ -385,7 +385,7 @@ le programme passait énormément de temps à recopier les données déjà prés
 Nous avons finalement décidé de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
 Néanmoins, nous avons réalisé une petite étude sur un petit jeu de données afin de se rendre compte des différences.
 
-\section{Calcul de la distance de Jaccard :}\label{subsec:jdis}
+\section{Calcul de la distance de Jaccard}\label{subsec:jdis}
 \paragraph{Les paires distinctes :}
 Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
 rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
@@ -480,6 +480,45 @@ caractère par caractère dans le fichier donné par la tête de lecture en para
 Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non ainsi que la découpe des mots.
 
 \section{Performances}\label{sec:perf}
+\paragraph{Tests :}
+À défaut d'avoir utiliser des tests unitaires nous avons tout de même tenu à tester notre exécutable de manière automatique sur au moins
+tous les exemples donnés dans le sujet de projet. Pour ne pas avoir à le faire à la main nous avons écrit un 
+petit script bash permettant de tester selon différents inputs le résultat obtenu avec celui de l'exécutable déposé sur universitice par 
+M.Hancart, pour cela nous avons eu recourt comme préconnisé à diff on affiche si le test est un succès ou non :
+\begin{lstlisting}[style=Cstyle]
+  TEST_PROG="./jdis"
+  REF_PROG="./jdis_prof"
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NO_COLOR='\033[0m'    
+  declare -a TESTS=(
+      "./textes/x0.txt ./textes/x1.txt"
+      "./textes/x1.txt ./textes/x2.txt"
+      "./textes/x2.txt ./textes/x0.txt"
+      "./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-g -i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-g ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "-g -p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "-p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "./textes/toto0.txt ./textes/toto0.txt"
+      "./textes/toto0.txt ./textes/lesmiserables.txt"
+      "-p ./textes/toto0.txt ./textes/lesmiserables.txt"
+      "./textes/lesmiserables.txt ./textes/sssrmllieeeba.txt ./textes/abeeeillmrsss.txt"
+  )
+  for args in "${TESTS[@]}"; do
+      output_test=$("$TEST_PROG" $args 2>/dev/null)
+      output_ref=$("$REF_PROG" $args 2>/dev/null)
+      if diff <(echo "$output_test") <(echo "$output_ref") > /dev/null; then
+          echo -e "${GREEN}SUCCESS: $args ${NO_COLOR}"
+      else
+          echo -e "${RED} FAILED : $args${NO_COLOR}"
+      fi
+  done
+\end{lstlisting}
+
+
 \paragraph{Implémentations antérieures :} Il est à noté que lors de nos différentes versions du projet nous avons 
 essayer une implémentation avec possibilité de stocker plusieurs fois les mêmes mots pour des fichiers différents,
 ce qui était en soit beaucoup moins efficace d'un point de vue mémoire car dans le pire des cas nous avions deux fichiers
