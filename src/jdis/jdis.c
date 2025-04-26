@@ -50,11 +50,11 @@ double jdis(bst *p, bst *q, size_t card_interction) {
 //  value_max caractères, stocke dans la zone pointée par buffer et si wp est à
 //  vrai alors gère la ponctuation comme séparateur, en cas de succès renvoie 0
 //  sinon EOF.
-static int hm__fscanf(FILE *stream, int value_max, char **buffer, bool wp,
+static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
     bool wc) {
   int c;
   char *p = *buffer;
-  int cptr = 0;
+  size_t cptr = 0;
   while ((c = fgetc(stream)) != EOF) {
     if (wp && ispunct(c)) {
       break;
@@ -82,6 +82,9 @@ static int hm__fscanf(FILE *stream, int value_max, char **buffer, bool wp,
   if (cptr > 0) {
     *p = '\0';
   }
+  if (cptr >= value_max || (cptr >= WORD_INIT_SIZE && wc)){
+    fprintf(stderr, "***Le mot \" %s...\" a été coupé\n", *buffer);
+  }
   if (feof(stream) != 0) {
     return EOF;
   }
@@ -101,7 +104,7 @@ static FILE *create__file(char *file_name) {
   return p;
 }
 
-bst *file_to_bst(char *file_name, int value_max, bool wp, bst *uni_words) {
+bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
   if (uni_words == nullptr) {
     return nullptr;
   }
@@ -133,8 +136,12 @@ bst *file_to_bst(char *file_name, int value_max, bool wp, bst *uni_words) {
   }
   int r = hm__fscanf(p, value_max, &x, wp, wc);
   while (r != EOF) {
-    char *y = malloc(strlen(x) + 1);
-    strcpy(y, x);
+    char *is_in = bst_search(uni_words, x);
+    char *y = x;
+    if (is_in == nullptr){
+      y = malloc(strlen(x) + 1);
+      strcpy(y, x);
+    }
     char *retour_add_uni = bst_add_endofpath(uni_words, y);
     if (retour_add_uni == nullptr) {
       return nullptr;
@@ -146,14 +153,13 @@ bst *file_to_bst(char *file_name, int value_max, bool wp, bst *uni_words) {
       bst_dispose(&bst_f);
       return nullptr;
     }
-    if (y != retour_add_uni) {
-      free(y);
-    }
     r = hm__fscanf(p, value_max, &x, wp, wc);
   }
   free(x);
   if (p != stdin) {
-    fclose(p);
+    if (fclose(p) == EOF){
+      return nullptr;
+    }
   }
   return bst_f;
 }

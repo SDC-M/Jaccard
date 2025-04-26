@@ -24,7 +24,7 @@ style=alphabetic,
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{Distance de Jaccard}
-\fancyhead[R]{Projet Algorithmie 3}
+\fancyhead[R]{Projet Algorithmique 3}
 \fancyhead[C]{De-backer Cuvelier Sébastien Llobregat Nicolas}
 \fancyfoot[C]{\thepage}
 
@@ -37,11 +37,11 @@ style=alphabetic,
 \newcommand{\fondpremierepage}{
   \begin{tikzpicture}[remember picture, overlay]
     \node[align=center, text width=0.8\textwidth, font=\huge\bfseries] at (current page.center) {
-        Projet Algorithmie 3 La distance de Jaccard};
+        Projet Algorithmique 3 La distance de Jaccard};
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 14 Avril 2025};
+        Version du 24 Avril 2025};
   \end{tikzpicture}
 }
 
@@ -158,7 +158,9 @@ Celle-ci va utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du mod
 \paragraph{L'option -iVALUE / --initial=VALUE :}
 Cette option permet de fixer la taille des mots à \textbf{VALUE}.
 Celle-ci est traitée au moment de la lecture des mots et permet de signaler qu'il faut ignorer tous les caractères dépassant cette
-limite jusqu'au prochain caractère de séparation (voir \textbf{\ref{subsec:fscanf}}).
+limite jusqu'au prochain caractère de séparation (voir \textbf{\ref{subsec:fscanf}}). À savoir que par défaut il n'y a pas de limite en
+tant que telle, la taille maximale d'un mot sera alors ULONG\_MAX ce qui est plus que raisonnable. En cas de découpe d'un on affiche sur la
+sortie erreur un message d'avertissement indiquant le mot qui a été coupé.
 
 \paragraph{L'option -p / --punctuation-like-space :}
 Cette option permet d'indiquer à la fonction de lecture que les caractères de ponctuation de la classe \texttt{isspace} et \texttt{ispunct}
@@ -166,7 +168,7 @@ doivent être considérés comme des séparateurs pour segmentation des mots.
 
 \paragraph{L'option \texttt{--} :}
 Cette option permet d'échapper l'argument qui suit sur la ligne de commande. Si nous avons un fichier appelé 
-\texttt{--help}, par exemple, cette option nous permet de traiter ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
+\texttt{-help}, par exemple, cette option nous permet de traiter ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
 Cela se fait tout simplement par le fait d'effectuer le test de comparaison de la présence de l'option en premier afin de stocke rle nom du fichier.
 
 \paragraph{L'option \texttt{-} :}
@@ -175,15 +177,315 @@ Cette dernière option permet de rentrer des mots sur l'entrée standard pour qu
 \subsection{Gestions des fichiers}\label{subsec:files}
 Pour gérer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
 associé en mode lecture seule puis nous lisons (précisions \textbf{\ref{subsec:fscanf}}) chaque
-mot et nous tentons de l'ajouter à l'arbre binaire associé. À la fin de la lecture, nous avons
-un arbre contenant des pointeurs vers les mots. Il est à noté que pour un même fichier, on stocke
-en un et un seul exemplaire les mots apparaissant plusieurs fois dans le même fichier. Nous avons un
-tableau avec l'ensemble des arbres créer.
+mot et nous tentons de l'ajouter à l'arbre binaire de recherche représentant l'union, si le mot est
+déjà dedans nous ajoutons la référence à l'arbre binaire de recherche associé au fichier sinon nous allouons
+une zone mémoire permettant de stocker ce mot dans l'arbre des unions et l'ajoutons de la même façon à l'arbre du 
+fichier concerné. À la fin de la lecture, nous avons un arbre contenant des pointeurs vers les mots eux-mêmes contenus 
+dans l'arbre des unions. Il est donc à noté que pour l'ensemble des mots traités nous n'avons pas de doublons de mots.
 
 \paragraph{Exemple :}
-Ainsi si nous exécutons la commande suivante : \colorbox{lightgray!20}{\textit{./jdis x0.txt x1.txt x2.txt}}
-où les fichiers x0.txt et x1.txt sont ceux donnés dans le sujet du projet, nous aurons la représentation
-suivante :
+Nous allons donc dérouler un exemple. Prenons trois fichiers t1.txt t2.txt t3.txt contenant respectivement
+les mots suivants :
+\begin{lstlisting}[style=Cstyle]
+  t1.txt : i f h z
+  t2.txt : a d e f
+  t3.txt : a b c
+\end{lstlisting}
+Et que nous exécutons la commande suivante :
+\begin{lstlisting}[style=Cstyle]
+  ./jdis t1.txt t2.txt t3.txt
+\end{lstlisting}
+Nous aurons donc la représentation suivante en mémoire :
+\begin{center}
+  \begin{tikzpicture}
+    \node (case1) at (-7, 0) [rectangle, draw, minimum width=3cm, minimum height=1cm] {t1.txt};
+    \node (case2) at (-4, 0) [rectangle, draw, minimum width=3cm, minimum height=1cm] {t2.txt};
+    \node (case3) at (-1, 0) [rectangle, draw, minimum width=3cm, minimum height=1cm] {t3.txt};
+    
+    \node at (-7, 0.75) {\textbf{\textcolor{red}{0}}};
+    \node at (-4, 0.75) {\textbf{\textcolor{red}{1}}};
+    \node at (-1, 0.75) {\textbf{\textcolor{red}{2}}};
+    \node at (-9, 0) {\textbf{\textcolor{red}{t}}};
+
+    \node at (-5.5, -17.6) {\textit{\textbf{\textcolor{red}{a\_union}}}};
+    \node at (-9.75, -2.25) {\textit{\textbf{\textcolor{red}{a1}}}};
+    \node at (-4.5, -2.25) {\textit{\textbf{\textcolor{red}{a2}}}};
+    \node at (0.15, -2.25) {\textit{\textbf{\textcolor{red}{a3}}}};
+
+    \draw[->, bend right=10] (case1) to node[below] {} (-8.7, -1.7);
+    \draw[->, bend left=5] (case2) to node[below] {} (-3.65, -1.7);
+    \draw[->, bend left=15] (case3) to node[below] {} (1, -1.6);  
+
+    \node (case4) at (-9, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {g};
+    \node (case5) at (-7.75, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {z};
+    \node (case6) at (-6.5, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {h};
+    \node (case7) at (-5.25, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {f};
+    \node (case8) at (-4, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {d};
+    \node (case9) at (-2.75, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {a};
+    \node (case10) at (-1.5, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {e};
+    \node (case11) at (-0.25, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {b};
+    \node (case12) at (1, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {c};
+
+    \draw[->, color=red, dashed] (-7, -5.5) to (case5);
+    \draw[->, color=red, bend left=30, dashed] (-7, -4) to (case6);
+    \draw[->, color=red, dashed] (-8.75, -2) to (case4);
+    \draw[->, color=red, bend left=50, dashed] (-10, -4) to (case7);
+    \draw[->, color=red, dashed] (-5, -4) to (case9);
+    \draw[->, color=red, bend right=5, dashed] (-3.5, -2.5) to (case8);
+    \draw[->, color=red, bend left=10, dashed] (-2, -4) to (case10);
+    \draw[->, color=red, bend right=10, dashed] (-2, -5.5) to (case7);
+    \draw[->, color=red, bend left=25, dashed] (-0.5, -4) to (case9);
+    \draw[->, color=red, bend left=5, dashed] (1.2, -2.5) to (case11);
+    \draw[->, color=red, bend left=5, dashed] (2.75, -4) to (case12);
+
+    \draw[->, color=red, bend left=5, dashed] (-7.5, -10.5) to (case5);
+    \draw[->, color=red, bend right=10, dashed] (-7.5, -12.5) to (case6);
+    \draw[->, color=red, bend left=10, dashed] (-6.5, -15.5) to (case7);
+    \draw[->, color=red, bend left=5, dashed] (-5.5, -10.5) to (case4);
+    \draw[->, color=red, dashed] (-4, -17.5) to (case8);
+    \draw[->, color=red, bend left=5, dashed] (-3, -12.5) to (case12);
+    \draw[->, color=red, bend left=5, dashed] (-1.75, -15.5) to (case11);
+    \draw[->, color=red, bend right=10, dashed] (-0.3, -12.5) to (case9);
+
+    \node at (-11.5, -16) {\textbf{\textcolor{red}{char *}}};
+    \draw[->, color=red, , dashed] (-12, -16.5) -- (-10, -16.5);
+    \node at (-11.6, -15) {\textbf{{bst *}}};
+    \draw[->] (-12, -15.5) -- (-10, -15.5);
+    \node at (-11.1, -17.15) {\textbf{{@ : adresse}}};
+
+
+    \node at (-3.5, -3.8) {
+      \begin{tikzpicture}[
+        scale=0.4,
+        sibling distance=40mm,
+        level distance=40mm,
+        every node/.style={draw, fill=gray!20, minimum width=0.85cm, minimum height=0.85cm},
+        edge from parent/.style={draw, thick},
+        level 1/.style={sibling distance=80mm},
+        level 2/.style={sibling distance=40mm},
+        level 3/.style={sibling distance=20mm}
+      ]
+        \node {@d}
+          child { node {@a}}
+          child { node {@e}
+              child { node {@f}}
+          };
+      \end{tikzpicture}
+        
+    };
+      
+    \node at (1.15, -2.95) {
+        \begin{tikzpicture}[
+          scale=0.4,
+          sibling distance=40mm,
+          level distance=40mm,
+          every node/.style={draw, fill=gray!20, minimum width=0.85cm, minimum height=0.85cm},
+          edge from parent/.style={draw, thick},
+          level 1/.style={sibling distance=80mm},
+          level 2/.style={sibling distance=40mm},
+          level 3/.style={sibling distance=20mm}
+        ]
+          \node {@b}
+            child { node {@a}}
+            child { node {@c}};
+        \end{tikzpicture}
+    };
+      
+    \node at (-8.7, -3.8) {
+      \begin{tikzpicture}[
+        scale=0.4,
+        sibling distance=40mm,
+        level distance=40mm,
+        every node/.style={draw, fill=gray!20, minimum width=0.85cm, minimum height=0.85cm},
+        edge from parent/.style={draw, thick},
+        level 1/.style={sibling distance=80mm},
+        level 2/.style={sibling distance=40mm},
+        level 3/.style={sibling distance=20mm}
+      ]
+        \node {@g}
+          child { node {@f}}
+          child { node {@h}
+              child { node {@z}}
+          };
+      \end{tikzpicture}
+        
+    };
+    \node at (-4, -14) {
+      \begin{tikzpicture}[
+        scale=0.6,
+        sibling distance=80mm,
+        level distance=40mm,
+        every node/.style={draw, fill=gray!20, minimum width=0.85cm, minimum height=0.85cm},
+        edge from parent/.style={draw, thick},
+        level 1/.style={sibling distance=80mm},
+        level 2/.style={sibling distance=40mm},
+        level 3/.style={sibling distance=20mm}
+      ]
+        \node{@d}[rotate=180] 
+          child { node{@b}
+            child { node {@a}[rotate=180]  }
+            child { node {@c}[rotate=180]  }
+          }
+          child { node {@f} 
+            child { node {@e}
+              child { node {@g} }
+            }
+            child { node {@h} 
+              child { node {@z}}
+            }
+          };
+      \end{tikzpicture}
+    };
+  \end{tikzpicture}
+\end{center}
+
+\begin{center}
+  \colorbox{lightgray!20}{\textit{\underline{Conversion des fichiers en AVL et création de l'arbre union}}}
+\end{center}
+\textbf{Nous avons choisi de ne pas représenter les sous-arbres vides pour une meilleure lisbilité.}
+
+\subsection{Gestion de l'entrée standard}\label{subsec:stdin}
+\paragraph{Questionnement :}
+Nous avons réfléchi comment traiter l'argument particulier \textbf{'-'}, deux choix
+s'offraient alors à nous, créer l'arbre depuis l'entrée standard directement ou bien de stocker l'entrée standard dans un fichier
+puis effectuer le même traitement que sur les autres arguments sans distinction aucune. Par soucis d'efficacité,
+c'est donc la première solution qui a été choisie. Dans le cas où l'on détecte '-' à la place d'un nom de fichier alors nous avons plus
+qu'à lire depuis l'entrée standard. Il est à noté que nous devons effectuer un \textbf{rewind} de l'entrée standart au cas ou nous
+aurions plusieurs fois l'entrée standart en argument puisqu'il faut que l'on puisse repartir au début de celle-ci.
+
+\section{Choix d'implémentation}
+
+\subsection{Stockage des mots avec holdall}
+\paragraph{Généralités :}
+Dans un premier temps nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, 
+afin de séparer le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction\\
+\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
+Ainsi nous limitons l'utilisation de beaucoup de code supplémentaire et nous faisons une pierre de coup avec 
+avec l'arbre union pour le calcul de la distance de Jaccard en elle-même car nous accédons à la taille de l'arbre en temps constant.
+Nous avons également décider de tester cette solution en parallèle et nous en faisons référence dans
+la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
+Deux versions de ce module ont été réfléchis pendant la création de ce projet. La première en utilisant le 
+principe des listes dynamiques simplement chainées et la seconde en utilisant les tableaux dynamiques.
+\subsubsection{Implémentation par LDSC}\label{subsec:impl}
+Pendant les cours d'algorithmique, nous avons étudié les listes dynamiques simplement chaînées (LDSC).
+Ce type de structure permet d'ajouter rapidement des éléments en tête de liste, en temps constant,
+ce qui est très avantageux en termes de performance. En effet, chaque ajout nécessite juste de créer
+un nouveau maillon et de modifier un pointeur, sans avoir à déplacer d'autres éléments. 
+Cependant, cette rapidité a un coût : chaque maillon prend plus de mémoire, car il contient un pointeur en 
+plus de la donnée. Cela devient encombrant quand les fichiers sont volumineux. De plus, l'accès à un élément précis 
+est plus lent, car il faut parcourir la liste depuis le début.
+\subsubsection{Implémentation par tableaux dynamiques}
+Pour résoudre le problème d'espace, nous avons pensé aux tableaux dynamiques. En effet l'avantage, ici,
+est que les ajouts se font également en temps constant grâce à un accès direct aux cellules du tableau et nous n'avions
+pas besoin d'allouer toute une cellule de liste pour un seul mot ; nous avions juste à allouer un tableau assez grand pour
+stocker les mots. Pour les petits fichiers cette implémentation s'est montré très efficace, mais pour les gros fichiers
+le programme passait énormément de temps à recopier les données déjà présentes dans le tableau.
+
+\paragraph{Conclusion :}
+Nous avons finalement décidé de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
+Néanmoins, nous avons réalisé une petite étude sur un petit jeu de données afin de se rendre compte des différences.
+
+\section{Calcul de la distance de Jaccard :}\label{subsec:jdis}
+\paragraph{Les paires distinctes :}
+Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
+rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
+Nous allons avoir à calculer la distance de Jaccard entre chaque couple deux à deux
+distincts d'arbres. Pour cela il suffit d'avoir deux boucles imbriquées : 
+\begin{lstlisting}[style=Cstyle]
+for (int i = 0; i < k - 1; ++i) {
+  for (int j = i + 1; j < k; ++j) {
+    . . .
+  }
+}  
+\end{lstlisting}
+\underline{La première boucle :} nous commençons à $i = 0$ et allons jusqu'à $i = k - 2$ (car $i < k - 1$)\\
+\underline{La deuxième boucle :} pour chaque valeur de $i$ nous commençons à $j = i + 1$ et va 
+jusqu'à $j = k - 1$ (car $j < k$).
+L'idée ici est de parcourir chaque combinaison unique de $i$ et $j$ où $i$ est strictement inférieur à $j$. 
+Cela permet de créer une paire unique sans répéter les mêmes éléments dans les deux positions.
+
+\paragraph{Rappel sur la distance de Jaccard:}
+Nous devons maintenant effectuer le calcul de la distance de jaccard, petit rappel sur la formule :
+La \textbf{distance de Jaccard} entre deux ensembles \( A \) et \( B \) est définie par la formule suivante :
+
+\[
+J_{\delta}(A, B) = 
+\begin{cases} 
+0 & \text{si } A = \emptyset \wedge B = \emptyset, \\
+1 - \frac{|A \cap B|}{|A \cup B|} & \text{sinon.} \\
+\end{cases}
+\]
+
+\paragraph{Calcul du cardinal de l'union :}
+Nous avons donc besoin du cardinal de l'intersection ainsi que le cardinal de l'union de chaque couple,
+pour cela nous allons en réalité ne calculer que le cardinal de l'intersection. En effet, nous allons utiliser
+une petite astuce de la théorie des ensembles qui nous dit que : Le cardinal de l'union de deux ensemble ce n'est rien d'autre
+que la somme de leurs cardinaux respectifs moins le cardinal de l'intersection. On peut facilement s'en rendre compte ici:
+
+\begin{center}
+\begin{tikzpicture}
+  \draw[fill=blue,opacity=0.5] (0,0) circle(2);
+  \draw[fill=red,opacity=0.5] (2,0) circle(2);
+
+  \node at (-1,1) {\textbf{A}};
+  \node at (3,1) {\textbf{B}};
+
+  \node at (1,0) {\textbf{A $\cap$ B}};
+  \node at (-2,-1.5) {\textbf{A$ \setminus $B}};
+  \node at (4,-1.5) {\textbf{B$ \setminus $A}};  
+\end{tikzpicture}
+\end{center}
+\begin{center}
+  \colorbox{lightgray!20}{\textit{\underline{Schéma 1: Généralités sur les ensembles}}}
+\end{center}
+
+\paragraph{Calcul du cardinal de l'intersection}
+Nous devons alors calculer l'intersection des deux ensembles, pour cela nous allons de nouveau
+utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl}. Cette fois-ci 
+nous allons un contexte qui sera une structure contenant un compteur ainsi que le plus petit des deux 
+ensembles. Ansi, nous allons parcourir le plus grand des deux et rechercher dans le plus petit la référence 
+grâce à la fonction \textbf{bst\_search} du module \textbf{avl}. Si on la trouve alors on ajoute un au compteur
+cela veut dire qu'elle se trouve dans les deux sinon non. À la fin dans le contexte, nous aurons le cardinal de l'ensemble.
+
+\paragraph{Calcul final :}
+Il nous reste plus qu'à rassembler les éléments, ainsi nous avons :
+Un moins le cardinal de l'intersection divisé par la taille des deux arbres moins le cardinal de l'intersection ce qui nous donne
+la distance de Jaccard entre les deux ensembles de mots de la paire de fichiers. On peut alors réitéré sur toutes les paires.
+
+\section{Les difficultés rencontrées}
+
+\subsection{Tentative d'utilisation de getopt}
+\paragraph{La bibliothèque getopt :} 
+En premier lieu nous nous sommes intéressés à la bibliothèque getopt qui nous permettait de parser 
+la ligne de commande pour trouver les options notamment grâce à \textbf{optind} et \textbf{optarg}. 
+Nous pouvions également préciser quelles options nécessitaient des paramètres comme pour l'option qui
+permet de fixer la taille maximale des mots \textbf{-iVALUE} ou \textbf{--initial=VALUE}. Grâce à \textbf{getopt}
+nous avons pu implanter les options très rapidement, mais nous avons rencontré un problème 
+lorsque nous voulions implanter l'option '--' permettant d'échapper le nom d'un fichier.
+En effet, lorsque nous utilisions cette option, nous avons remarqué quelle échappait tous les 
+paramètres qui suivaient. Nous avons d'abord cherché une solution en remplaçant \textbf{getopt}
+par \textbf{getopt\_long}. Ce qui nous compliquait la tâche. Finalement il a été choisi de parser
+nous même la ligne de commande pour avoir un contrôle total sur son traitement.
+
+\subsection{La fonction fscanf}\label{subsec:fscanf}
+\paragraph{utilisation de fscanf :}
+Afin de créer les arbres comme nous l'avons décrit dans la section \textbf{\ref{subsec:files}} nous avons
+besoin de lire dans les fichiers, pour se faire il convient d'usage d'utiliser la fonction \textbf{fscanf}, et c'est le choix
+que nous avions fait lors de la première partie du projet cependant, après avoir essayé d'implémenter l'option 
+-p (resp. --punctuation-like-space) nous avions un problème de compréhension de la fonction. Il fallait de plus
+analyser une deuxième fois le buffer que nous prenions afin de l'analyser par la suite. En outre cela revenait à lire chacun des caractères
+deux fois et donc de doubler la compléxité temporelle. Il a été alors naturellement convenu de coder notre propre
+fonction de lecture  d'où l'apparition de la fonction statique \textbf{hm\_\_fscanf} (hm pour home maid). Ainsi nous lisons
+caractère par caractère dans le fichier donné par la tête de lecture en paramètre grâce à la fonction \textbf{fgetc}.
+Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non ainsi que la découpe des mots.
+
+\section{Performances}\label{sec:perf}
+\paragraph{Implémentations antérieures :} Il est à noté que lors de nos différentes versions du projet nous avons 
+essayer une implémentation avec possibilité de stocker plusieurs fois les mêmes mots pour des fichiers différents,
+ce qui était en soit beaucoup moins efficace d'un point de vue mémoire car dans le pire des cas nous avions deux fichiers
+identiques donc deux fois plus d'espace occupé cependant nous avions des temps beaucoup plus raisonnable. De l'ordre de deux
+à trois fois plus rapide que notre exécutable actuel. Ainsi nous avions cette représentation lors de la conversion des fichiers en AVL:
+
 \begin{center}
   \begin{tikzpicture}
     \node (case1) at (0, 0) [rectangle, draw, minimum width=1cm, minimum height=3cm] {x2.txt};
@@ -279,147 +581,13 @@ suivante :
 \end{center}
 
 \begin{center}
-  \colorbox{lightgray!20}{\textit{\underline{Exemple 1: Conversion d'un fichier en arbre}}}
+  \colorbox{lightgray!20}{\textit{\underline{Version antérieure de la conversion des fichiers en AVL}}}
 \end{center}
 
-\subsection{Gestion de l'entrée standard}\label{subsec:stdin}
-\paragraph{Questionnement :}
-Nous avons réfléchi comment traiter l'argument particulier \textbf{'-'}, deux Choix
-s'offraient alors à nous, créer l'arbre depuis l'entrée standard directement ou bien de stocker l'entrée standard dans un fichier
-puis effectuer le même traitement que sur les autres arguments sans distinction aucune. Par soucis d'efficacité,
-c'est donc la première solution qui a été choisie. Dans le cas où l'on détecte '-' à la place d'un nom de fichier alors nous avons plus
-qu'à lire depuis l'entrée standard.
-
-\section{Choix d'implémentation}
-
-\subsection{Stockage des mots avec holdall}
-\paragraph{Généralités :}
-Dans un premier temps nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, 
-afin de séparer le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
-\textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
-Nous avons également décider de tester cette solution en parallèle et nous en faisons référence dans
-la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
-Deux versions de ce module ont été réfléchis pendant la création de ce projet. La première en utilisant le 
-principe des listes dynamiques simplement chainées et la seconde en utilisant les tableaux dynamiques.
-\subsubsection{Implémentation par LDSC}\label{subsec:impl}
-Pendant les cours d'algorithmique, nous avons étudié les listes dynamiques simplement chaînées (LDSC).
-Ce type de structure permet d'ajouter rapidement des éléments en tête de liste, en temps constant,
-ce qui est très avantageux en termes de performance. En effet, chaque ajout nécessite juste de créer
-un nouveau maillon et de modifier un pointeur, sans avoir à déplacer d'autres éléments. 
-Cependant, cette rapidité a un coût : chaque maillon prend plus de mémoire, car il contient un pointeur en 
-plus de la donnée. Cela devient encombrant quand les fichiers sont volumineux. De plus, l'accès à un élément précis 
-est plus lent, car il faut parcourir la liste depuis le début.
-\subsubsection{Implémentation par tableaux dynamiques}
-Pour résoudre le problème d'espace, nous avons pensé aux tableaux dynamiques. En effet l'avantage, ici,
-est que les ajouts se font également en temps constant grâce à un accès direct aux cellules du tableau et nous n'avions
-pas besoin d'allouer toute une cellule de liste pour un seul mot ; nous avions juste à allouer un tableau assez grand pour
-stocker les mots. Pour les petits fichiers cette implémentation s'est montré très efficace, mais pour les gros fichiers
-le programme passait énormément de temps à recopier les données déjà présentes dans le tableau.
-
-\paragraph{Conclusion :}
-Nous avons finalement décidé de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
-Néanmoins, nous avons réalisé une petite étude sur un petit jeu de données afin de se rendre compte des différences.
-
-\section{Calcul de la distance de Jaccard :}\label{subsec:jdis}
-\paragraph{Les paires distinctes :}
-Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
-rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
-Nous allons avoir à calculer la distance de Jaccard entre chaque couple deux à deux
-distincts d'arbres. Pour cela il suffit d'avoir deux boucles imbriquées : 
-\newpage{}
-\begin{lstlisting}[style=Cstyle]
-for (int i = 0; i < k - 1; ++i) {
-  for (int j = i + 1; j < k; ++j) {
-    . . .
-  }
-}  
-\end{lstlisting}
-\underline{La première boucle :} nous commençons à $i = 0$ et allons jusqu'à $i = k - 2$ (car $i < k - 1$)\\
-\underline{La deuxième boucle :} pour chaque valeur de $i$ nous commençons à $j = i + 1$ et va 
-jusqu'à $j = k - 1$ (car $j < k$).
-L'idée ici est de parcourir chaque combinaison unique de $i$ et $j$ où $i$ est strictement inférieur à $j$. 
-Cela permet de créer une paire unique sans répéter les mêmes éléments dans les deux positions.
-
-\paragraph{Rappel sur la distance de Jaccard:}
-Nous devons maintenant effectuer le calcul de la distance de jaccard, petit rappel sur la formule :
-La \textbf{distance de Jaccard} entre deux ensembles \( A \) et \( B \) est définie par la formule suivante :
-
-\[
-J_{\delta}(A, B) = 
-\begin{cases} 
-0 & \text{si } A = \emptyset \wedge B = \emptyset, \\
-1 - \frac{|A \cap B|}{|A \cup B|} & \text{sinon.} \\
-\end{cases}
-\]
-
-\paragraph{Calcul du cardinal de l'union :}
-Nous avons donc besoin du cardinal de l'intersection ainsi que le cardinal de l'union de chaque couple,
-pour cela nous allons en réalité ne calculer que le cardinal de l'intersection. En effet, nous allons utiliser
-une petite astuce de la théorie des ensembles qui nous dit que : Le cardinal de l'union de deux ensemble ce n'est rien d'autre
-que la somme de leurs cardinaux respectifs moins le cardinal de l'intersection. On peut facilement s'en rendre compte ici:
-
-\begin{center}
-\begin{tikzpicture}
-  \draw[fill=blue,opacity=0.5] (0,0) circle(2);
-  \draw[fill=red,opacity=0.5] (2,0) circle(2);
-
-  \node at (-1,1) {\textbf{A}};
-  \node at (3,1) {\textbf{B}};
-
-  \node at (1,0) {\textbf{A $\cap$ B}};
-  \node at (-2,-1.5) {\textbf{A$ \setminus $B}};
-  \node at (4,-1.5) {\textbf{B$ \setminus $A}};  
-\end{tikzpicture}
-\end{center}
-\begin{center}
-  \colorbox{lightgray!20}{\textit{\underline{Schéma 1: Généralités sur les ensembles}}}
-\end{center}
-
-\paragraph{Calcul du cardinal de l'intersection}
-Nous devons alors calculer l'intersection des deux ensembles, pour cela nous allons de nouveau
-utiliser la fonction \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl}. Cette fois-ci 
-nous allons un contexte qui sera une structure contenant un compteur ainsi que le plus petit des deux 
-ensembles. Ansi, nous allons parcourir le plus grand des deux et rechercher dans le plus petit la référence 
-grâce à la fonction \textbf{bst\_search} du module \textbf{avl}. Si on la trouve alors on ajoute un au compteur
-cela veut dire qu'elle se trouve dans les deux sinon non. À la fin dans le contexte, nous aurons le cardinal de l'ensemble.
-
-\paragraph{Calcul final :}
-Il nous reste plus qu'à rassembler les éléments, ainsi nous avons :
-Un moins le cardinal de l'intersection divisé par la taille des deux arbres moins le cardinal de l'intersection ce qui nous donne
-la distance de Jaccard entre les deux ensembles de mots de la paire de fichiers. On peut alors réitéré sur toutes les paires.
-
-\section{Les difficultés rencontrées}
-
-\subsection{Tentative d'utilisation de getopt}
-\paragraph{La bibliothèque getopt :} 
-En premier lieu nous nous sommes intéressés à la bibliothèque getopt qui nous permettait de parser 
-la ligne de commande pour trouver les options notamment grâce à \textbf{optind} et \textbf{optarg}. Nous pouvions également préciser 
-quelles options nécessitaient des paramètres comme pour l'option qui permet de fixer la taille 
-maximale des mots \textbf{-iVALUE} ou \textbf{--initial=VALUE}. Grâce à \textbf{getopt}
-nous avons pu implanter les options très rapidement, mais nous avons rencontré un problème 
-lorsque nous voulions implanter l'option '--' permettant d'échapper le nom d'un fichier.
-En effet, lorsque nous utilisions cette option, nous avons remarqué quelle échappait tous les 
-paramètres qui suivaient. Nous avons d'abord cherché une solution en remplaçant \textbf{getopt}
-par \textbf{getopt\_long}. Ce qui nous compliquait la tâche. Finalement il a été choisi de parser
-nous même la ligne de commande pour avoir un contrôle total sur son traitement.
-
-\subsection{La fonction fscanf}\label{subsec:fscanf}
-\paragraph{utilisation de fscanf :}
-Afin de créer les arbres comme nous l'avons décrit dans la section \textbf{\ref{subsec:files}} nous avons
-besoin de lire dans les fichiers, pour se faire il convient d'usage d'utiliser la fonction \textbf{fscanf}, et c'est le choix
-que nous avions fait lors de la première partie du projet cependant, après avoir essayé d'implémenter l'option 
--p (resp. --punctuation-like-space) nous avions un problème de compréhension de la fonction. Il fallait de plus
-analyser une deuxième fois le buffer que nous prenions afin de l'analyser par la suite. En outre cela revenait à lire chacun des caractères
-deux fois et donc de doubler la compléxité temporelle. Il a été alors naturellement convenu de coder notre propre
-fonction de lecture  d'où l'apparition de la fonction statique \textbf{hm\_\_fscanf} (hm pour home maid). Ainsi nous lisons
-caractère par caractère dans le fichier donné par la tête de lecture en paramètre grâce à la fonction \textbf{fgetc}.
-Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non.
-
-\section{Performances}\label{sec:perf}
 \paragraph{Analyse de quelques données :}
 Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
-une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.\\\\
-\textbf{Avec le module holdall implémenté par LDSC:}
+une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
+\textbf{Avec le module holdall implémenté par LDSC: (À REFAIRE SUR LES MACHINES DE LA FAC )}
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
@@ -519,25 +687,18 @@ celles proposées dans notre projet. Nous avions effectivement réduit le nombre
 
 \paragraph{Sans module \texttt{Holdall:}} En effet supprimer totalement ce module permettrais de supprimer beaucoup d'allocations et donc de gagner du temps.
 De plus nous stockons déjà toutes les références des mots dans les "AVL fichiers", nous avons donc utilisé la fonction \textbf{bst\_dft\_infix\_apply\_context}
-pour nous permettre de parcourir tous les AVL et ainsi libérer les références. Et cette méthode, c'est avérée la meilleure au vu des résultats. Avec les mêmes 
-textes cités précédemment nous avons pu diviser le temps par 45 par rapport à l'implémentation par tableau dynamique, et environ 2M d'octets de gagnés 
-par rapport au LDSC.
+pour nous permettre de parcourir l'arbre "union" et ainsi libérer les références. Et cette méthode, c'est avérée la meilleure au vu des résultats.
 
 \section{Améliorations possibles}
 
 \paragraph{Une implémentation totalement différente :} Nous avons remarqué grâce à l'exécutable fourni sur universitice 
 que nous pouvions faire bien mieux en utilisant les tables de hachages. En effet, en utilisant une table de hachage qui contiendrait
 tous les mots distincts en tant que clés et l'appartenance dans les fichiers en tant que valeurs, nous aurions eu besoin d'allouer 
-seulement la table de hachage ; là où, pour notre projet, nous avions besoin d'un AVL par fichiers et également un AVL d'union totale 
-pour l'affichage du graphe lorsque celui-ci est demandé. Nous perdons donc beaucoup de temps à allouer les ressources nécessaires. 
+seulement la table de hachage ; là où, pour notre projet, nous avions besoin d'un AVL par fichiers et également un AVL d'union totale. 
+Nous perdons donc beaucoup de temps à allouer les ressources nécessaires. 
 
-\paragraph{N'allouer qu'une seule fois les références :} Un autre problème de notre implémentation, c'est vu qu'on créér un AVL par fichier
-ce qui cause plusieurs allocations d'un même mot lorsque celui-ci existe dans plusieurs fichiers. La solution serait de stocker des pointeurs
-vers les références, qui elles sont uniques, dans les AVL. Nous avions déjà pensé à cette solution avant mais ne pouvions pas le coder vu 
-les restrictions données dans le sujet, c'est-à-dire : 
-\begin{center}
-  \textbf{"vous utiliserez nécessairement soit l’en-tête \texttt{hashtable.h}, soit
-  l’en-tête \texttt{bst.h}, \underline{sans les modifier}"}
-\end{center}
+\paragraph{Les noms de fichiers :} Pour avoir le noms des fichiers nous faisons un malloc du nombre d'argument sur la ligne de commande
+ce qui est pas toujours nécéssaire, en effet il n'y a pas que des noms de fichiers nous allouons donc parfois trop même si ce n'est pas 
+un grande zone mémoire cela pourrait être améliorer.
 
 \end{document}

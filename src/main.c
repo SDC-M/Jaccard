@@ -3,12 +3,14 @@
 #include <string.h>
 #include <assert.h>
 #include <locale.h>
+#include <limits.h>
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
+#define WORD_INIT_SIZE 63
 
 #define LONG_G "--graph"
 #define LONG_H "--help"
@@ -62,9 +64,12 @@ static int scptr_display(context *ctx, const char *ref) {
   printf("%s\t", ref);
   for (int i = 0; i < ctx->nb_bst; ++i) {
     if (bst_search(ctx->t[i], ref) != nullptr) {
-      fprintf(stdout, "x\t");
+      fprintf(stdout, "x");
     } else {
-      fprintf(stdout, "-\t");
+      fprintf(stdout, "-");
+    }
+    if (i != ctx->nb_bst - 1) {
+      fprintf(stdout, "\t");
     }
   }
   printf("\n");
@@ -92,10 +97,13 @@ int rfree(void *ctx, const void *ref) {
 }
 
 int main(int argc, char *argv[]) {
-  setlocale(LC_ALL, "");
+  if (setlocale(LC_COLLATE, "") == nullptr) {
+    printf("*** Erreur lors de la mise à jour de la locale\n");
+    return EXIT_FAILURE;
+  }
   bool graph = false;
   bool escaped_file = false;
-  int value_max = 0;
+  size_t value_max = 0;
   bool want_punc = false;
   int nb_files = 0;
   char **filenames = malloc((size_t) argc * sizeof(char *));
@@ -115,9 +123,17 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], SHORT_G) == 0 || strcmp(argv[i], LONG_G) == 0) {
       graph = true;
     } else if (strstr(argv[i], LONG_I) != nullptr) {
-      value_max = atoi(argv[i] + LEN_LONG_OPT_INITIAL);
+      value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL, nullptr, 10);
+      if (value_max == ULONG_MAX) {
+        fprintf(stderr, "*** Too high value\n");
+        goto dispose_err_val_max;
+      }
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
-      value_max = atoi(argv[i] + LEN_SHORT_OPT_INITIAL);
+      value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL, nullptr, 10);
+      if (value_max == ULONG_MAX) {
+        fprintf(stderr, "*** Valeur de limite trop élevée\n");
+        goto dispose_err_val_max;
+      }
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
@@ -154,7 +170,11 @@ int main(int argc, char *argv[]) {
   }
   if (graph) {
     for (int i = 0; i < nb_files; ++i) {
-      printf("\t%s", filenames[i]);
+      if (strcmp(filenames[i], "-") == 0) {
+        printf("\t\"\"");
+      } else {
+        printf("\t%s", filenames[i]);
+      }
     }
     printf("\n");
     graph_belonging(tab, uni_words, nb_files);
@@ -163,7 +183,17 @@ int main(int argc, char *argv[]) {
       for (int j = i + 1; j < nb_files; ++j) {
         size_t card_in = card_intersection(tab[i], tab[j]);
         double jaccard_distance = jdis(tab[i], tab[j], card_in);
-        printf("%s\t%s: %.4lf\n", filenames[i], filenames[j], jaccard_distance);
+        printf("%.4lf\t", jaccard_distance);
+        if (strcmp(filenames[i], "-") == 0) {
+          printf("\"\"\t");
+        } else {
+          printf("%s\t", filenames[i]);
+        }
+        if (strcmp(filenames[j], "-") == 0) {
+          printf("\"\"\n");
+        } else {
+          printf("%s\n", filenames[j]);
+        }
       }
     }
   }
@@ -172,10 +202,11 @@ dispose2:
     bst_dispose(&tab[i]);
   }
   bst_dft_infix_apply_context(uni_words, 0, nullptr, rfree, nullptr,
-    nullptr);
+      nullptr);
   bst_dispose(&uni_words);
 dispose:
-  free(filenames);
   free(tab);
+dispose_err_val_max:
+  free(filenames);
   return EXIT_SUCCESS;
 }
