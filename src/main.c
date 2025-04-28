@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
       ++nb_files;
     } else if (strcmp(argv[i], SHORT_H) == 0 || strcmp(argv[i], LONG_H) == 0) {
       help();
+      goto exit;
     } else if (strcmp(argv[i], SHORT_P) == 0 || strcmp(argv[i], LONG_P) == 0) {
       want_punc = true;
     } else if (strcmp(argv[i], SHORT_G) == 0 || strcmp(argv[i], LONG_G) == 0) {
@@ -214,6 +215,7 @@ int main(int argc, char *argv[]) {
   holdall_dispose(&words);
   bst_dispose(&uni_words);
   free(tab);
+exit:
   free(filenames);
   return EXIT_SUCCESS;
 dispose2:
