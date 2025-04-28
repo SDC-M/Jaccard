@@ -7,6 +7,7 @@
 
 #include "avl/bst.h"
 #include "jdis/jdis.h"
+#include "holdall/holdall.h"
 
 #define LEN_LONG_OPT_INITIAL 10
 #define LEN_SHORT_OPT_INITIAL 2
@@ -135,8 +136,15 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
-      filenames[nb_files] = argv[i];
-      ++nb_files;
+      if (argv[i][0] == '-') {
+        fprintf(stderr,
+            "*** Option inconnue : %s -help pour plus d'informations\n",
+            argv[i]);
+        goto dispose_err_val_max;
+      } else {
+        filenames[nb_files] = argv[i];
+        ++nb_files;
+      }
     }
   }
   if (nb_files < 2) {
@@ -155,7 +163,7 @@ int main(int argc, char *argv[]) {
     goto dispose2;
   }
   holdall *words = holdall_empty();
-  if (words == nullptr){
+  if (words == nullptr) {
     goto dispose;
   }
   for (int i = 0; i < nb_files; ++i) {
@@ -219,5 +227,5 @@ dispose:
   free(tab);
 dispose_err_val_max:
   free(filenames);
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
