@@ -1,4 +1,5 @@
 #include "../avl/bst.h"
+#include "../holdall/holdall.h"
 
 // struct bst, bst : type et nom de type d'un contrôleur regroupant les
 //  informations nécessaires pour gérer un contexte avec un compteur et un
@@ -26,4 +27,4 @@ extern double jdis(bst *p, bst *q, size_t card_interction);
 //  zone mémoire précédemment allouée, si le nom de fichier ou le fourre-tout
 //  sont des pointeurs null, retourne nullptr.
 extern bst *file_to_bst(char *file_name, size_t value_max, bool wp,
-    bst *uni_words);
+    bst *uni_words, holdall *words);

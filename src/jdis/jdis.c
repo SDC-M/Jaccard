@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <ctype.h>
 #include "jdis.h"
+#include "../holdall/holdall.h"
 
 #define WORD_INIT_SIZE 63
 #define MULT_COEFF 2
@@ -104,7 +105,10 @@ static FILE *create__file(char *file_name) {
   return p;
 }
 
-bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
+bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words, holdall *words) {
+  if (words == nullptr){
+    return nullptr;
+  }
   if (uni_words == nullptr) {
     return nullptr;
   }
@@ -141,6 +145,9 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words) {
     if (is_in == nullptr){
       y = malloc(strlen(x) + 1);
       strcpy(y, x);
+      if (holdall_put(words, y) != 0){
+        return nullptr;
+      }
     }
     char *retour_add_uni = bst_add_endofpath(uni_words, y);
     if (retour_add_uni == nullptr) {

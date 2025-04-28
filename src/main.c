@@ -89,9 +89,7 @@ int graph_belonging(bst **t, bst *uni, int nb_file) {
   return 0;
 }
 
-int rfree(void *ctx, const void *ref) {
-  if (ctx == nullptr) {
-  }
+int rfree(void *ref) {
   free((void *) ref);
   return 0;
 }
@@ -156,8 +154,12 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
     goto dispose2;
   }
+  holdall *words = holdall_empty();
+  if (words == nullptr){
+    goto dispose;
+  }
   for (int i = 0; i < nb_files; ++i) {
-    tab[i] = file_to_bst(filenames[i], value_max, want_punc, uni_words);
+    tab[i] = file_to_bst(filenames[i], value_max, want_punc, uni_words, words);
     if (tab[i] == nullptr) {
       fprintf(stderr, "*** Erreur de l'allocation pour le fichier : %s\n",
           filenames[i]);
@@ -197,14 +199,23 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+  for (int i = 0; i < nb_files; ++i) {
+    bst_dispose(&tab[i]);
+  }
+  holdall_apply(words, rfree);
+  holdall_dispose(&words);
+  bst_dispose(&uni_words);
+  free(tab);
+  free(filenames);
+  return EXIT_SUCCESS;
 dispose2:
   for (int i = 0; i < nb_files; ++i) {
     bst_dispose(&tab[i]);
   }
-  bst_dft_infix_apply_context(uni_words, 0, nullptr, rfree, nullptr,
-      nullptr);
   bst_dispose(&uni_words);
 dispose:
+  holdall_apply(words, rfree);
+  holdall_dispose(&words);
   free(tab);
 dispose_err_val_max:
   free(filenames);
