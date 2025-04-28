@@ -41,7 +41,7 @@ style=alphabetic,
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 26 Avril 2025};
+        Version du 24 Avril 2025};
   \end{tikzpicture}
 }
 
@@ -216,6 +216,7 @@ Nous aurons donc la représentation suivante en mémoire :
     \draw[->, bend left=5] (case2) to node[below] {} (-3.65, -1.7);
     \draw[->, bend left=15] (case3) to node[below] {} (1, -1.6);  
 
+    \node at (-11, -8) {\textit{\textbf{Holdall :}}};
     \node (case4) at (-9, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {g};
     \node (case5) at (-7.75, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {z};
     \node (case6) at (-6.5, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {h};
@@ -234,19 +235,18 @@ Nous aurons donc la représentation suivante en mémoire :
     \draw[->, color=red, bend right=5, dashed] (-3.5, -2.5) to (case8);
     \draw[->, color=red, bend left=10, dashed] (-2, -4) to (case10);
     \draw[->, color=red, bend right=10, dashed] (-2, -5.5) to (case7);
-    \draw[->, color=red, bend left=25, dashed] (- 0.5, -4) to (case9);
+    \draw[->, color=red, bend left=25, dashed] (-0.5, -4) to (case9);
     \draw[->, color=red, bend left=5, dashed] (1.2, -2.5) to (case11);
     \draw[->, color=red, bend left=5, dashed] (2.75, -4) to (case12);
 
     \draw[->, color=red, bend left=5, dashed] (-7.5, -10.5) to (case5);
     \draw[->, color=red, bend right=10, dashed] (-7.5, -12.5) to (case6);
-    \draw[->, color=red, bend left=10, dashed] (-6, -15.5) to (case7);
-    \draw[->, color=red, bend left=5, dashed] (-6.5, -10.5) to (case4);
-    \draw[->, color=red, dashed] (-3.75, -17.5) to (case8);
-    \draw[->, color=red, bend left=5, dashed] (-2.75, -12.5) to (case12);
-    \draw[->, color=red, bend left=5, dashed] (-1.5, -15.5) to (case11);
+    \draw[->, color=red, bend left=10, dashed] (-6.5, -15.5) to (case7);
+    \draw[->, color=red, bend left=5, dashed] (-5.5, -10.5) to (case4);
+    \draw[->, color=red, dashed] (-4, -17.5) to (case8);
+    \draw[->, color=red, bend left=5, dashed] (-3, -12.5) to (case12);
+    \draw[->, color=red, bend left=5, dashed] (-1.75, -15.5) to (case11);
     \draw[->, color=red, bend right=10, dashed] (-0.3, -12.5) to (case9);
-    \draw[->, color=red, bend right=10, dashed] (-5, -12.5) to (case10);
 
     \node at (-11.5, -16) {\textbf{\textcolor{red}{char *}}};
     \draw[->, color=red, , dashed] (-12, -16.5) -- (-10, -16.5);
@@ -322,15 +322,16 @@ Nous aurons donc la représentation suivante en mémoire :
         level 2/.style={sibling distance=40mm},
         level 3/.style={sibling distance=20mm}
       ]
-        \node{@d}[rotate=180]
+        \node{@d}[rotate=180] 
           child { node{@b}
             child { node {@a}[rotate=180]  }
             child { node {@c}[rotate=180]  }
           }
           child { node {@f} 
-            child { node {@e} }
-            child { node {@h} 
+            child { node {@e}
               child { node {@g} }
+            }
+            child { node {@h} 
               child { node {@z}}
             }
           };
@@ -383,9 +384,10 @@ le programme passait énormément de temps à recopier les données déjà prés
 
 \paragraph{Conclusion :}
 Nous avons finalement décidé de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
-Néanmoins, nous avons réalisé une petite étude sur un petit jeu de données afin de se rendre compte des différences.
+Néanmoins, nous avons réalisé cette implémentation et évidemment tester cette dernière. Nous en parlons plus en détail 
+dans la \textbf{section 6} où nous donnons quelques précisions sur les performances de nos différentes versions de ce projet. 
 
-\section{Calcul de la distance de Jaccard}\label{subsec:jdis}
+\section{Calcul de la distance de Jaccard :}\label{subsec:jdis}
 \paragraph{Les paires distinctes :}
 Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
 rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
@@ -475,50 +477,11 @@ que nous avions fait lors de la première partie du projet cependant, après avo
 -p (resp. --punctuation-like-space) nous avions un problème de compréhension de la fonction. Il fallait de plus
 analyser une deuxième fois le buffer que nous prenions afin de l'analyser par la suite. En outre cela revenait à lire chacun des caractères
 deux fois et donc de doubler la compléxité temporelle. Il a été alors naturellement convenu de coder notre propre
-fonction de lecture  d'où l'apparition de la fonction statique \textbf{hm\_\_fscanf} (hm pour home maid). Ainsi nous lisons
+fonction de lecture  d'où l'apparition de la fonction statique \textbf{hm\_\_fscanf} (hm pour home made). Ainsi nous lisons
 caractère par caractère dans le fichier donné par la tête de lecture en paramètre grâce à la fonction \textbf{fgetc}.
 Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non ainsi que la découpe des mots.
 
 \section{Performances}\label{sec:perf}
-\paragraph{Tests :}
-À défaut d'avoir utiliser des tests unitaires nous avons tout de même tenu à tester notre exécutable de manière automatique sur au moins
-tous les exemples donnés dans le sujet de projet. Pour ne pas avoir à le faire à la main nous avons écrit un 
-petit script bash permettant de tester selon différents inputs le résultat obtenu avec celui de l'exécutable déposé sur universitice par 
-M.Hancart, pour cela nous avons eu recourt comme préconnisé à diff on affiche si le test est un succès ou non :
-\begin{lstlisting}[style=Cstyle]
-  TEST_PROG="./jdis"
-  REF_PROG="./jdis_prof"
-  GREEN='\033[0;32m'
-  RED='\033[0;31m'
-  NO_COLOR='\033[0m'    
-  declare -a TESTS=(
-      "./textes/x0.txt ./textes/x1.txt"
-      "./textes/x1.txt ./textes/x2.txt"
-      "./textes/x2.txt ./textes/x0.txt"
-      "./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-      "-i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-      "-g -i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-      "-g ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-      "./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-      "-g -p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-      "-p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-      "./textes/toto0.txt ./textes/toto0.txt"
-      "./textes/toto0.txt ./textes/lesmiserables.txt"
-      "-p ./textes/toto0.txt ./textes/lesmiserables.txt"
-      "./textes/lesmiserables.txt ./textes/sssrmllieeeba.txt ./textes/abeeeillmrsss.txt"
-  )
-  for args in "${TESTS[@]}"; do
-      output_test=$("$TEST_PROG" $args 2>/dev/null)
-      output_ref=$("$REF_PROG" $args 2>/dev/null)
-      if diff <(echo "$output_test") <(echo "$output_ref") > /dev/null; then
-          echo -e "${GREEN}SUCCESS: $args ${NO_COLOR}"
-      else
-          echo -e "${RED} FAILED : $args${NO_COLOR}"
-      fi
-  done
-\end{lstlisting}
-
-
 \paragraph{Implémentations antérieures :} Il est à noté que lors de nos différentes versions du projet nous avons 
 essayer une implémentation avec possibilité de stocker plusieurs fois les mêmes mots pour des fichiers différents,
 ce qui était en soit beaucoup moins efficace d'un point de vue mémoire car dans le pire des cas nous avions deux fichiers
@@ -626,7 +589,7 @@ identiques donc deux fois plus d'espace occupé cependant nous avions des temps 
 \paragraph{Analyse de quelques données :}
 Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
 une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
-\textbf{Avec le module holdall implémenté par LDSC: (À REFAIRE SUR LES MACHINES DE LA FAC )}
+\textbf{Sans module holdall sur la version finale du projet (À REFAIRE SUR LES MACHINES DE LA FAC )}
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
@@ -652,32 +615,7 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
   };
 \end{tikzpicture}
 \end{center}
-\textbf{Avec le module holdall implémenté par tableaux dynamiques avec gestion préfixielle:}
-\begin{center}
-\begin{tikzpicture}
-  \node[inner sep=0pt] (table) {
-    \begin{tabular}{|>{\raggedright\arraybackslash}m{3.3cm}|
-      >{\centering\arraybackslash}m{2.2cm}|
-      >{\centering\arraybackslash}m{2.3cm}|
-      >{\columncolor{blue!10}\centering\arraybackslash}m{2.2cm}|
-      >{\columncolor{blue!10}\centering\arraybackslash}m{2.8cm}|
-      >{\centering\arraybackslash}m{2.5cm}|}  
-  \hline
-  \rowcolor{gray!20}
-  \textbf{Fichiers} & \textbf{Tailles (MB)} & \textbf{Nombre de mots} & \textbf{Temps réel (s)} & \textbf{Allocations (bytes)} & \textbf{Distance de Jaccard} \\
-  \hline
-  abeeeillmrsss / lesmiserables.txt & 3.1 / 3.1 & 60242 / 60242 & \textbf{38.538} & \textbf{12707198} & 0 \\
-  \hline
-  tartuffe.txt / lesmiserables.txt & 0.1163 / 3.1 & 4804 / 60242 & \textbf{11.679} & \textbf{6486544} & 0.9474 \\
-  \hline
-  tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & \textbf{0.287} & \textbf{1122454} & 0.7852 \\
-  \hline
-  fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & \textbf{96.309} & \textbf{25510530} & 0.9957 \\
-  \hline
-  \end{tabular}
-  };
-\end{tikzpicture}
-\end{center}
+
 \textbf{Sans le module holdall en libérant les ressources avec la fonction bst\_dft\_infix\_apply\_context du module avl :}
 
 \begin{center}
@@ -706,11 +644,6 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
 \end{tikzpicture}
 \end{center}
 
-
-\paragraph{Conclusion :}
-Il est évident que la version sans holdall est bien plus performante. 
-
-\newpage{}
 \paragraph{\textbf{Précisions sur les résultats obtenus:}}
 
 \paragraph{Avec LDSC :} Comme nous pouvons le remarquer dans le premier tableau, les statistiques temporelles sont relativement satisfaisantes 
@@ -721,12 +654,16 @@ Nous pouvons donc l'améliorer en essayant de réduire le nombre d'allocations.
 
 \paragraph{Par tableaux dynamiques :} Ce qui, à première vue, semblait une amélioration possible de notre projet, c'est avérée la pire implémentation de
 celles proposées dans notre projet. Nous avions effectivement réduit le nombre d'allocations par rapport au LDSC, mais nous perdions un temps considérable
-à recopier le tableau dynamique lorsque celui-ci était trop petit. Comme nous pouvons le voir nous avons environ 39 secondes pour traiter les fichiers\\
-\textbf{\texttt{abeeeillmrsss.txt}} et \textbf{\texttt{lesmiserables.txt}}. Nous ne pouvions pas rester sur cette implémentation.
+à recopier le tableau dynamique lorsque celui-ci était trop petit. Pour vous donner quelques valeurs sur cette implémentation, nous pouvions traiter \textbf{lesmiserables.txt}
+et \textbf{abeeeillmrsss.txt} en à peu près 40 secondes là où sur notre implémentation actuelle nous avons \textbf{À ADAPTER EN FONCTION DES VALEURS SUR LES MACHINES}.
+Nous ne pouvions donc pas rester sur cette implémentation.
 
 \paragraph{Sans module \texttt{Holdall:}} En effet supprimer totalement ce module permettrais de supprimer beaucoup d'allocations et donc de gagner du temps.
 De plus nous stockons déjà toutes les références des mots dans les "AVL fichiers", nous avons donc utilisé la fonction \textbf{bst\_dft\_infix\_apply\_context}
-pour nous permettre de parcourir l'arbre "union" et ainsi libérer les références. Et cette méthode, c'est avérée la meilleure au vu des résultats.
+pour nous permettre de parcourir l'arbre "union" et ainsi libérer les références. Et cette méthode, cependant cette implémentation nécessitait de faire un 
+\texttt{\textbf{free(const void *)}} et nous étions seulement "Utilisateur" du module AVL et qu'en tant qu'utilisateur nous ne sommes pas censé savoir comment 
+est implémenter le module ce qui nous empêche d'utiliser cette versions de la libérations des références. Nous sommes donc rester sur la version avec la version avec
+un Holdall implémenter avec des LDSC.
 
 \section{Améliorations possibles}
 
@@ -739,5 +676,12 @@ Nous perdons donc beaucoup de temps à allouer les ressources nécessaires.
 \paragraph{Les noms de fichiers :} Pour avoir le noms des fichiers nous faisons un malloc du nombre d'argument sur la ligne de commande
 ce qui est pas toujours nécéssaire, en effet il n'y a pas que des noms de fichiers nous allouons donc parfois trop même si ce n'est pas 
 un grande zone mémoire cela pourrait être améliorer.
+
+\paragraph{\texttt{--V--V--V--} AMÉLIORATIONS POSSIBLEMENT FAITE \texttt{--V--V--V--}} 
+
+\paragraph{L'utilisation de la fonction de comparaison strcoll:} Avec notre implémentation nous utilisons un arbre d'union que l'on utilise comme un holdall.
+Le problème dans cette implémentation c'est que cet arbre utilise la fonction strcoll pour chacun de ses ajout tout au long du programme.
+Nous pourrions améliorer notre projet en reprennant un holdall vu en TP que l'on trie seulement à la fin du programme via un appel à \textbf{qsort} ou \textbf{heapsort} par exemple.
+Ce qui nous ferais gagner pas mal de temps.
 
 \end{document}
