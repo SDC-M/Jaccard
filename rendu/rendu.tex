@@ -370,17 +370,15 @@ aurions plusieurs fois l'entrée standart en argument puisqu'il faut que l'on pu
 
 \subsection{Stockage des mots avec holdall}
 \paragraph{Généralités :}
-Dans un premier temps nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, 
-afin de séparer le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction\\
+Nous avons eu recourt au module \textbf{holdall} pour le stockage des mots, 
+afin de séparer le traitement des mots de la gestion en mémoire. Nous aurions pu choisir d'utiliser la fonction
 \textbf{bst\_dft\_infix\_apply\_context} du module \textbf{avl} pour libérer les ressources.
 Ainsi nous limitons l'utilisation de beaucoup de code supplémentaire et nous faisons une pierre de coup avec 
 avec l'arbre union pour le calcul de la distance de Jaccard en elle-même car nous accédons à la taille de l'arbre en temps constant.
-Nous avons également décider de tester cette solution en parallèle et nous en faisons référence dans
-la section \textbf{\ref{sec:perf}} liée aux performances de l'implémentation proposée.
-Deux versions de ce module ont été réfléchis pendant la création de ce projet. La première en utilisant le 
-principe des listes dynamiques simplement chainées et la seconde en utilisant les tableaux dynamiques.
+liée aux performances de l'implémentation proposée. Deux versions de ce module ont été réfléchis pendant la création de ce projet. 
+La première en utilisant le principe des listes dynamiques simplement chainées (LDSC par la suite) et la seconde en utilisant les tableaux dynamiques.
 \subsubsection{Implémentation par LDSC}\label{subsec:impl}
-Pendant les cours d'algorithmique, nous avons étudié les listes dynamiques simplement chaînées (LDSC).
+Pendant les cours d'algorithmique, nous avons étudié les LDSC.
 Ce type de structure permet d'ajouter rapidement des éléments en tête de liste, en temps constant,
 ce qui est très avantageux en termes de performance. En effet, chaque ajout nécessite juste de créer
 un nouveau maillon et de modifier un pointeur, sans avoir à déplacer d'autres éléments. 
@@ -394,15 +392,12 @@ pas besoin d'allouer toute une cellule de liste pour un seul mot ; nous avions j
 stocker les mots. Pour les petits fichiers cette implémentation s'est montré très efficace, mais pour les gros fichiers
 le programme passait énormément de temps à recopier les données déjà présentes dans le tableau.
 
-\paragraph{Conclusion :}
-Nous avons finalement décidé de ne pas utiliser ce module pour avoir une performance optimale sur notre exécutable.
-Néanmoins, nous avons réalisé cette implémentation et évidemment tester cette dernière. Nous en parlons plus en détail 
-dans la \textbf{section 6} où nous donnons quelques précisions sur les performances de nos différentes versions de ce projet. 
+\newpage{}
 
 \section{Calcul de la distance de Jaccard :}\label{subsec:jdis}
 \paragraph{Les paires distinctes :}
 Nous avons maintenant notre tableau avec des pointeurs vers nos arbres, on peut
-rappeler que la taille d'un arbre s'effectue en temps contant dans le contrôleur.
+rappeler que la taille d'un arbre se récupère en temps constant dans le contrôleur.
 Nous allons avoir à calculer la distance de Jaccard entre chaque couple deux à deux
 distincts d'arbres. Pour cela il suffit d'avoir deux boucles imbriquées : 
 \begin{lstlisting}[style=Cstyle]
@@ -450,7 +445,7 @@ que la somme de leurs cardinaux respectifs moins le cardinal de l'intersection. 
 \end{tikzpicture}
 \end{center}
 \begin{center}
-  \colorbox{lightgray!20}{\textit{\underline{Schéma 1: Généralités sur les ensembles}}}
+  \colorbox{lightgray!20}{\textit{\underline{Généralités sur les ensembles}}}
 \end{center}
 
 \paragraph{Calcul du cardinal de l'intersection}

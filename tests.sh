@@ -1,36 +1,48 @@
-    TEST_PROG="./jdis"
-    REF_PROG="./jdis_prof"
+#!/bin/bash
 
-    GREEN='\033[0;32m'
-    RED='\033[0;31m'
-    NO_COLOR='\033[0m'
+TEST_PROG="./jdis"
+REF_PROG="./jdis_prof"
 
-    declare -a TESTS=(
-        "./textes/x0.txt ./textes/x1.txt"
-        "./textes/x1.txt ./textes/x2.txt"
-        "./textes/x2.txt ./textes/x0.txt"
-        "./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-        "-i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-        "-g -i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
-        "-g ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-        "./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-        "-g -p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-        "-p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
-        "./textes/toto0.txt ./textes/toto0.txt"
-        "./textes/toto0.txt ./textes/lesmiserables.txt"
-        "-p ./textes/toto0.txt ./textes/lesmiserables.txt"
-        "./textes/lesmiserables.txt ./textes/sssrmllieeeba.txt ./textes/abeeeillmrsss.txt"
-        "./textes/fr_.txt ./textes/domjuan.txt ./textes/tartuffe.txt"
-    )
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NO_COLOR='\033[0m'
 
-    for args in "${TESTS[@]}"; do
-        output_test=$("$TEST_PROG" $args 2>/dev/null)
-        output_ref=$("$REF_PROG" $args 2>/dev/null)
+declare -a TESTS=(
+  "./textes/x0.txt ./textes/x1.txt"
+  "./textes/x1.txt ./textes/x2.txt"
+  "./textes/x2.txt ./textes/x0.txt"
+  "./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+  "-i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+  "-g -i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+  "-g ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+  "./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+  "-g -p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+  "-p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+  "./textes/toto0.txt ./textes/toto0.txt"
+  "./textes/toto0.txt ./textes/lesmiserables.txt"
+  "-p ./textes/toto0.txt ./textes/lesmiserables.txt"
+  "./textes/lesmiserables.txt ./textes/sssrmllieeeba.txt ./textes/abeeeillmrsss.txt"
+  "-nimportequoi ./textes/x0.txt ./textes/x0.txt"
+  "-- ./textes/-g ./textes/x0.txt"
+)
 
-        if diff <(echo "$output_test") <(echo "$output_ref") > /dev/null; then
-            echo -e "${GREEN}SUCCESS: $args ${NO_COLOR}"
-        else
-            echo -e "${RED} FAILED : $args${NO_COLOR}"
-            diff <(echo "$output_test") <(echo "$output_ref")
-        fi
-    done
+for args in "${TESTS[@]}"; do
+  for word in $args; do
+      if [[ $word == ./* ]]; then
+          if [[ ! -f $word ]]; then
+              echo "*** Warning : FILE NOT FOUND: '$word' in: $args"
+              continue 2
+          fi
+      fi
+  done
+
+  output_test=$("$TEST_PROG" $args 2>/dev/null)
+  output_ref=$("$REF_PROG" $args 2>/dev/null)
+
+  if diff <(echo "$output_test") <(echo "$output_ref") > /dev/null; then
+      echo -e "${GREEN}SUCCESS: $args ${NO_COLOR}"
+  else
+      echo -e "${RED} FAILED : $args${NO_COLOR}"
+      diff <(echo "$output_test") <(echo "$output_ref")
+  fi
+done
