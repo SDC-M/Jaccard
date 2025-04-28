@@ -178,20 +178,22 @@ doivent être considérés comme des séparateurs pour segmentation des mots.
 
 \paragraph{L'option \texttt{--} :}
 Cette option permet d'échapper l'argument qui suit sur la ligne de commande. Si nous avons un fichier appelé 
-\texttt{-help}, par exemple, cette option nous permet de traiter ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
+\texttt{--help}, par exemple, cette option nous permet de traiter ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
 Cela se fait tout simplement par le fait d'effectuer le test de comparaison de la présence de l'option en premier afin de stocke rle nom du fichier.
 
 \paragraph{L'option \texttt{-} :}
 Cette dernière option permet de rentrer des mots sur l'entrée standard pour qu'ils soient traité comme un fichier (voir \textbf{\ref{subsec:stdin}}).
+
+\paragraph{Toute autre option renvoie un message d'erreur associé et met fin au programme.}
 
 \subsection{Gestions des fichiers}\label{subsec:files}
 Pour gérer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
 associé en mode lecture seule puis nous lisons (précisions \textbf{\ref{subsec:fscanf}}) chaque
 mot et nous tentons de l'ajouter à l'arbre binaire de recherche représentant l'union, si le mot est
 déjà dedans nous ajoutons la référence à l'arbre binaire de recherche associé au fichier sinon nous allouons
-une zone mémoire permettant de stocker ce mot dans l'arbre des unions et l'ajoutons de la même façon à l'arbre du 
+une zone mémoire permettant de stocker ce mot dans le fourre-tout et dans l'arbre des unions et l'ajoutons de la même façon à l'arbre du 
 fichier concerné. À la fin de la lecture, nous avons un arbre contenant des pointeurs vers les mots eux-mêmes contenus 
-dans l'arbre des unions. Il est donc à noté que pour l'ensemble des mots traités nous n'avons pas de doublons de mots.
+dans le fourre-tout et référencés dans l'arbre des unions. Il est donc à noté que pour l'ensemble des mots traités nous n'avons pas de doublons de mots.
 
 \paragraph{Exemple :}
 Nous allons donc dérouler un exemple. Prenons trois fichiers t1.txt t2.txt t3.txt contenant respectivement

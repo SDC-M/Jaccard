@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
     } else {
-      if (argv[i][0] == '-') {
+      if (argv[i][0] == '-' && strlen(argv[i]) != 1) {
         fprintf(stderr,
             "*** Option \"%s\" inconnue : --help pour plus d'informations\n",
             argv[i]);
