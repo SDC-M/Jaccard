@@ -119,7 +119,7 @@ de recherches équilibrés}, c'est la deuxième qui nous a convaincu. En effet, 
 facile de représenter les arbres et nous avions beaucoup plus travaillé sur cette notion en cours.
 
 \subsection{Les modules}
-Les modules utilisés sont: \textbf{avl}, \textbf{jdis}.
+Les modules utilisés sont: \textbf{avl}, \textbf{jdis}, \textbf{holdall}.
 
 \paragraph{Le module jdis :}
 Nous avons décidé de créer un module spécifique pour gérer la liaison entre le module \textbf{avl}
@@ -128,10 +128,20 @@ en un \textbf{avl}. En le calcul du cardinal de l'intersection des ensembles de 
 arbres. Et bien évidemment au calcul de la distance de Jaccard entre chaque couple deux à deux distincts
 des ensembles représentés par les arbres sur laquelle nous reviendrons dans là sous section \textbf{\ref{subsec:jdis}}.
 
+\paragraph{Le module avl :}
+Il constitue la base de notre projet puiqu'il nous permet de rechercher de manière efficace des mots et 
+cela en temps logarithmique.
+
+\paragraph{Le module holdall :}
+Comme vue durant l'année nous avons différencier la partie traitement de la partie gestion de la mémoire
+pour cela nous utilisons un fourre-tout, que nous avons décider de réimplémenter à l'aide de tableaux dynamiques
+afin de mettre en place son extension avec un tri par tas lui aussi vu au cours de l'année.
+
 \subsection{Gestion des options}
 \paragraph{Généralités :}
 Pour ce qui est de la gestion des options, nous avons décidé d'implanter à la fois les options longues et les options courtes.
-Les paragraphes qui suivent préciseront ce que ces options font et comment elles le font.
+Les paragraphes qui suivent préciseront ce que ces options font et comment elles le font. Il est a noté que nous supportons pas
+les préfixes des options longues pour ne pas créer de confusions.
 
 \paragraph{L'option -? / --help :}
 Cette option est très simple, elle permet d'afficher le menu d'aide pour l'utilisation 
@@ -216,7 +226,7 @@ Nous aurons donc la représentation suivante en mémoire :
     \draw[->, bend left=5] (case2) to node[below] {} (-3.65, -1.7);
     \draw[->, bend left=15] (case3) to node[below] {} (1, -1.6);  
 
-    \node at (-11, -8) {\textit{\textbf{Holdall :}}};
+    \node at (-10.5, -8) {\textit{\textcolor{red}{\textbf{Holdall :}}}};
     \node (case4) at (-9, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {g};
     \node (case5) at (-7.75, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {z};
     \node (case6) at (-6.5, -8) [rectangle, draw, minimum width=1cm, minimum height=1cm, fill=yellow!20] {h};
@@ -482,6 +492,44 @@ caractère par caractère dans le fichier donné par la tête de lecture en para
 Elle permet de gèrer en une seule fois le cas où nous devons prendre en compte la ponctuation ou non ainsi que la découpe des mots.
 
 \section{Performances}\label{sec:perf}
+\paragraph{Tests :}
+À défaut d'avoir utiliser des tests unitaires nous avons tout de même tenu à tester notre exécutable de manière automatique sur au moins
+tous les exemples donnés dans le sujet de projet. Pour ne pas avoir à le faire à la main nous avons écrit un 
+petit script bash permettant de tester selon différents inputs le résultat obtenu avec celui de l'exécutable déposé sur universitice par 
+M.Hancart, pour cela nous avons eu recourt comme préconnisé à diff on affiche si le test est un succès ou non :
+\begin{lstlisting}[style=Cstyle]
+  TEST_PROG="./jdis"
+  REF_PROG="./jdis_prof"
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NO_COLOR='\033[0m'    
+  declare -a TESTS=(
+      "./textes/x0.txt ./textes/x1.txt"
+      "./textes/x1.txt ./textes/x2.txt"
+      "./textes/x2.txt ./textes/x0.txt"
+      "./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-g -i2 ./textes/x0.txt ./textes/x1.txt ./textes/x2.txt"
+      "-g ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "-g -p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "-p ./textes/toto0.txt ./textes/toto1.txt ./textes/toto2.txt ./textes/toto3.txt"
+      "./textes/toto0.txt ./textes/toto0.txt"
+      "./textes/toto0.txt ./textes/lesmiserables.txt"
+      "-p ./textes/toto0.txt ./textes/lesmiserables.txt"
+      "./textes/lesmiserables.txt ./textes/sssrmllieeeba.txt ./textes/abeeeillmrsss.txt"
+  )
+  for args in "${TESTS[@]}"; do
+      output_test=$("$TEST_PROG" $args 2>/dev/null)
+      output_ref=$("$REF_PROG" $args 2>/dev/null)
+      if diff <(echo "$output_test") <(echo "$output_ref") > /dev/null; then
+          echo -e "${GREEN}SUCCESS: $args ${NO_COLOR}"
+      else
+          echo -e "${RED} FAILED : $args${NO_COLOR}"
+      fi
+  done
+\end{lstlisting}
+
 \paragraph{Implémentations antérieures :} Il est à noté que lors de nos différentes versions du projet nous avons 
 essayer une implémentation avec possibilité de stocker plusieurs fois les mêmes mots pour des fichiers différents,
 ce qui était en soit beaucoup moins efficace d'un point de vue mémoire car dans le pire des cas nous avions deux fichiers
@@ -589,7 +637,8 @@ identiques donc deux fois plus d'espace occupé cependant nous avions des temps 
 \paragraph{Analyse de quelques données :}
 Nous allons analyser quelques données afin d'avoir une idée de la performance de notre executable, nous verrons ensuite
 une étude théorique afin de conformer nos observations, enfin nous donnerons quelques pistes d'améliorations.
-\textbf{Sans module holdall sur la version finale du projet (À REFAIRE SUR LES MACHINES DE LA FAC )}
+
+\textbf{Avec module holdall sur la version finale du projet (À REFAIRE SUR LES MACHINES DE LA FAC )}
 \begin{center}
 \begin{tikzpicture}
   \node[inner sep=0pt] (table) {
@@ -610,34 +659,6 @@ une étude théorique afin de conformer nos observations, enfin nous donnerons q
   tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & \textbf{0.077} & \textbf{743102} & 0.7852 \\
   \hline
   fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & \textbf{1.165} & \textbf{23098730} & 0.9957 \\
-  \hline
-  \end{tabular}
-  };
-\end{tikzpicture}
-\end{center}
-
-\textbf{Sans le module holdall en libérant les ressources avec la fonction bst\_dft\_infix\_apply\_context du module avl :}
-
-\begin{center}
-\begin{tikzpicture}
-  \node[inner sep=0pt] (table) {
-  \begin{tabular}{|>{\raggedright\arraybackslash}m{3.3cm}|
-                  >{\centering\arraybackslash}m{2.2cm}|
-                  >{\centering\arraybackslash}m{2.3cm}|
-                  >{\columncolor{blue!10}\centering\arraybackslash}m{2.2cm}|
-                  >{\columncolor{blue!10}\centering\arraybackslash}m{2.8cm}|
-                  >{\centering\arraybackslash}m{2.5cm}|}
-  \hline
-  \rowcolor{gray!20}
-  \textbf{Fichiers} & \textbf{Tailles (MB)} & \textbf{Nombre de mots} & \textbf{Temps réel (s)} & \textbf{Allocations (bytes)} & \textbf{Distance de Jaccard} \\
-  \hline
-  abeeeillmrsss / lesmiserables.txt & 3.1 / 3.1 & 60242 / 60242 & \textbf{0.848} & \textbf{11134310} & 0 \\
-  \hline
-  tartuffe.txt / lesmiserables.txt & 0.1163 / 3.1 & 4804 / 60242 & \textbf{0.424} & \textbf{5962232} & 0.9474 \\
-  \hline
-  tartuffe.txt / domjuan.txt & 0.1163 / 0.1007 & 4804 / 4255 & \textbf{0.023} & \textbf{598142} & 0.7852 \\
-  \hline
-  fr\_.txt / domjuan.txt & 3.9 / 0.1007 & 336528 / 4255 & \textbf{0.393} & \textbf{17646186} & 0.9957 \\
   \hline
   \end{tabular}
   };
@@ -677,11 +698,10 @@ Nous perdons donc beaucoup de temps à allouer les ressources nécessaires.
 ce qui est pas toujours nécéssaire, en effet il n'y a pas que des noms de fichiers nous allouons donc parfois trop même si ce n'est pas 
 un grande zone mémoire cela pourrait être améliorer.
 
-\paragraph{\texttt{--V--V--V--} AMÉLIORATIONS POSSIBLEMENT FAITE \texttt{--V--V--V--}} 
-
 \paragraph{L'utilisation de la fonction de comparaison strcoll:} Avec notre implémentation nous utilisons un arbre d'union que l'on utilise comme un holdall.
 Le problème dans cette implémentation c'est que cet arbre utilise la fonction strcoll pour chacun de ses ajout tout au long du programme.
 Nous pourrions améliorer notre projet en reprennant un holdall vu en TP que l'on trie seulement à la fin du programme via un appel à \textbf{qsort} ou \textbf{heapsort} par exemple.
-Ce qui nous ferais gagner pas mal de temps.
+Ce qui nous ferais gagner pas mal de temps. Pour cela nous pourrions stocker qu'un seul arbre 
+et ainsi avoir une structure dans chaque noeud.
 
 \end{document}

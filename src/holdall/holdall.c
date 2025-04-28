@@ -3,7 +3,7 @@
 #include "holdall.h"
 #include <stdio.h>
 
-#define CAPACITY_MIN 256
+#define CAPACITY_MIN 512
 #define CAPACITY_MUL 2
 
 #define VALUE_ALREADY_EXIST 1
@@ -41,9 +41,9 @@ void holdall_dispose(holdall **haptr) {
 
 int holdall_put(holdall *ha, void *ref) {
   if (ha->count == ha->cap) {
-    char **new_array = realloc(ha->aref,
+    void **new_array = realloc(ha->aref,
           CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
-    if (new_array == nullptr){
+    if (new_array == nullptr) {
       return LACK_OF_MEMORY;
     }
     ha->cap *= CAPACITY_MUL;
@@ -99,14 +99,27 @@ int holdall_apply_context2(holdall *ha,
   return 0;
 }
 
-#if defined HOLDALL_WANT_EXT && HOLDALL_WANT_EXT != 0
+#if defined WANT_HOLDALL_EXT && defined HOLDALL_EXT
 
-static void swap(const void **aref, size_t i, size_t j){
-  const void *tmp = aref[i];
-  aref[i] = aref[j];
-  aref[j] = tmp;
+// mem_swap : prend en paramètres l'adresse de deux blocs mémoires et échange
+// les deux zones mémoires de taille size pointées par s1 et s2
+static void mem_swap(void *s1, void *s2, size_t size) {
+  char *p1 = s1;
+  char *p2 = s2;
+  // IB : 0 <= k && k<= size
+  //      && p1 == (char *)s1 + k
+  //      && p2 == (char *) s2 + k
+  //      && le préfixe de longueur k de s1 et s2 ont été  échangés
+  //      && les suffixes complémentaires n'ont pas été modifiés
+  // QC : k
+  for (size_t k = 0; k < size; ++k) {
+    int temp = *p1;
+    *p1 = *p2;
+    *p2 = (char) temp;
+    ++p1;
+    ++p2;
+  }
 }
-
 
 //  heapsort_down : il est supposé que base est l'adresse du premier composant
 //    d'un tableau de longueur nmemb et de taille de composants size, que
@@ -114,38 +127,46 @@ static void swap(const void **aref, size_t i, size_t j){
 //    [ k + 1 ... nmemb - 1 ] relativement à la fonction de comparaison pointée
 //    par compar. Descend le composant d'indice k à la bonne place de manière à
 //    faire du tableau un maximier sur [ k ... nmemb - 1 ].
-
 static void heapsort_down(char *base, size_t nmemb, size_t size,
-    int (*compar)(const void *, const void *), size_t k){
+    int (*compar)(const void *, const void *), size_t k) {
   size_t i = k;
-  while (true){
-    size_t max = i;
-    size_t left = 2 * i + 1;
-    size_t right = 2 * i + 2;
-    if (left < nmemb && compar(base + left * size, base + max * size) > 0){
-      max = left;
+  while (true) {
+    size_t gauche = 2 * i + 1;
+    size_t droite = 2 * i + 2;
+    size_t biggest = i;
+    if (gauche < nmemb && compar(base + gauche * size,
+          base + biggest * size) > 0) {
+      biggest = gauche;
     }
-    if (right < nmemb && compar(base + right * size, base + max * size) > 0){
-      max = right;
+    if (droite < nmemb && compar(base + droite * size,
+          base + biggest * size) > 0) {
+      biggest = droite;
     }
-    if (max == i){
+    if (biggest == i) {
       break;
     }
-    mem_swap(base + i * size, base + max * size, size);
-    i = max;
+    mem_swap(base + i * size, base + biggest * size, size);
+    i = biggest;
   }
 }
 
-void holdall_sort(holdall *ha
-    int (*compar)(const void *, const void *)){
-
-  for (size_t k = 0 ; k < ha->count; k += 1){
-    size_t icur = ((nmemb / 2) - k - 1);
-    heapsort_down((char *)base, nmemb, size, compar, icur);
+//  heapsort : même spécification que la fonction qsort déclarée dans l'en-tête
+//    <stdlib.h> de la bibliothèque standard.
+static void heapsort(void *base, size_t nmemb, size_t size,
+    int (*compar)(const void *, const void *)) {
+  for (size_t k = nmemb / 2; k > 0; k--) {
+    heapsort_down(base, nmemb, size, compar, k - 1);
   }
-  for (size_t nb = ha->count; nb > 0; --nb){
-    swap(ha->aref, nb, 0);
-    heapsort_down(ha->aref, ha->count, 1, compar, 0);
+  while (nmemb > 1) {
+    mem_swap(base, (char *) base + (nmemb - 1) * size, size);
+    nmemb--;
+    heapsort_down(base, nmemb, size, compar, 0);
   }
 }
+
+extern void holdall_sort(holdall *ha,
+    int (*compar)(const void *, const void *)) {
+  heapsort(ha, ha->count, 1, compar);
+}
+
 #endif

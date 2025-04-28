@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
     } else {
       if (argv[i][0] == '-') {
         fprintf(stderr,
-            "*** Option inconnue : %s -help pour plus d'informations\n",
+            "*** Option \"%s\" inconnue : --help pour plus d'informations\n",
             argv[i]);
         goto dispose_err_val_max;
       } else {

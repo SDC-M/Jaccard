@@ -93,10 +93,9 @@ extern int holdall_apply_context2(holdall *ha,
 
 //- STANDARD --^---^---^---^---^---^---^---^---^---^---^---^---^---^---^---^---^
 
-#undef HOLDALL_EXT
 #include "holdall_ip.h"
 
-#if defined HOLDALL_EXT && defined WANT_HOLDALL_EXT
+#if defined WANT_HOLDALL_EXT &&  defined HOLDALL_EXT
 
 //- EXTENSION -v---v---v---v---v---v---v---v---v---v---v---v---v---v---v---v---v
 

@@ -1,8 +1,6 @@
 jdis
 jdis_prof
-tests.sh
 .#makefile#
-textes/
 rendu/rendu.aux
 rendu/rendu.log
 rendu/rendu.out

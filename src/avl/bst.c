@@ -380,7 +380,7 @@ static void cbst__repr_graphic(const cbst *p, void (*put)(const void *ref),
   }
 }
 
-static int cbst__dft_infix_apply_context(cbst *t  , int dir,
+static int cbst__dft_infix_apply_context(cbst *t, int dir,
     void *context, int (*fun)(void *context, const void *ref),
     int (*fun_pre)(void *context), int (*fun_post)(void *context)) {
   if (t == nullptr) {

@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -std=c2x \
   -Wall -Wconversion -Werror -Wextra -Wpedantic -Wwrite-strings \
-  -O0 -g3
+  -O3
 src = $(shell find ./src/ -name '*.c')
 executable = jdis
 
@@ -28,7 +28,7 @@ archive:
 	tar -cvf ../projet.tar \
 		--exclude='.git' \
 		--exclude='.gitignore' \
-		--exclude='./.#makefile#' \
 		--exclude='textes' \
+		--exclude='tests.sh' \
 		--exclude='README.md' \
 		.

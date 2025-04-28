@@ -83,7 +83,7 @@ static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
   if (cptr > 0) {
     *p = '\0';
   }
-  if (cptr >= value_max || (cptr >= WORD_INIT_SIZE && wc)){
+  if (cptr >= value_max || (cptr >= WORD_INIT_SIZE && wc)) {
     fprintf(stderr, "***Le mot \" %s...\" a été coupé\n", *buffer);
   }
   if (feof(stream) != 0) {
@@ -105,8 +105,9 @@ static FILE *create__file(char *file_name) {
   return p;
 }
 
-bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words, holdall *words) {
-  if (words == nullptr){
+bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words,
+    holdall *words) {
+  if (words == nullptr) {
     return nullptr;
   }
   if (uni_words == nullptr) {
@@ -142,10 +143,10 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words, hol
   while (r != EOF) {
     char *is_in = bst_search(uni_words, x);
     char *y = x;
-    if (is_in == nullptr){
+    if (is_in == nullptr) {
       y = malloc(strlen(x) + 1);
       strcpy(y, x);
-      if (holdall_put(words, y) != 0){
+      if (holdall_put(words, y) != 0) {
         return nullptr;
       }
     }
@@ -164,7 +165,7 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words, hol
   }
   free(x);
   if (p != stdin) {
-    if (fclose(p) == EOF){
+    if (fclose(p) == EOF) {
       return nullptr;
     }
   }
