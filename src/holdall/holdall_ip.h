@@ -19,4 +19,4 @@
 
 #define HOLDALL_EXT
 
-//  holdall_sort : temps au plus quadratique ; espace constant
+//  holdall_sort : temps O(n*ln n) ; espace constant
