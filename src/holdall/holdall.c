@@ -3,14 +3,14 @@
 #include "holdall.h"
 #include <stdio.h>
 
-#define CAPACITY_MIN 2
+#define CAPACITY_MIN 256
 #define CAPACITY_MUL 2
 
 #define VALUE_ALREADY_EXIST 1
 #define LACK_OF_MEMORY -1
 
 struct holdall {
-  char **aref;
+  void **aref;
   size_t cap;
   size_t count;
 };
@@ -33,9 +33,6 @@ holdall *holdall_empty() {
 void holdall_dispose(holdall **haptr) {
   if (*haptr == nullptr) {
     return;
-  }
-  for (size_t i = 0; i < (*haptr)->count; i += 1) {
-    free((*haptr)->aref[i]);
   }
   free((*haptr)->aref);
   free(*haptr);
