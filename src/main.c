@@ -126,13 +126,13 @@ int main(int argc, char *argv[]) {
       value_max = strtoul(argv[i] + LEN_LONG_OPT_INITIAL, nullptr, 10);
       if (value_max == ULONG_MAX) {
         fprintf(stderr, "*** Too high value\n");
-        goto dispose_err_val_max;
+        goto dispose0;
       }
     } else if (strstr(argv[i], SHORT_I) != nullptr) {
       value_max = strtoul(argv[i] + LEN_SHORT_OPT_INITIAL, nullptr, 10);
       if (value_max == ULONG_MAX) {
         fprintf(stderr, "*** Valeur de limite trop élevée\n");
-        goto dispose_err_val_max;
+        goto dispose0;
       }
     } else if (strcmp(argv[i], ESCAPE_FILE) == 0) {
       escaped_file = true;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr,
             "*** Option \"%s\" inconnue : --help pour plus d'informations\n",
             argv[i]);
-        goto dispose_err_val_max;
+        goto dispose0;
       } else {
         filenames[nb_files] = argv[i];
         ++nb_files;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
   }
   bst **tab = malloc((size_t) (nb_files) * sizeof(bst *));
   if (tab == nullptr) {
-    goto dispose;
+    goto dispose1;
   }
   bst *uni_words = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (uni_words == nullptr) {
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
   }
   holdall *words = holdall_empty();
   if (words == nullptr) {
-    goto dispose;
+    goto dispose1;
   }
   for (int i = 0; i < nb_files; ++i) {
     tab[i] = file_to_bst(filenames[i], value_max, want_punc, uni_words, words);
@@ -223,11 +223,11 @@ dispose2:
     bst_dispose(&tab[i]);
   }
   bst_dispose(&uni_words);
-dispose:
+dispose1:
   holdall_apply(words, rfree);
   holdall_dispose(&words);
   free(tab);
-dispose_err_val_max:
+dispose0:
   free(filenames);
   return EXIT_FAILURE;
 }

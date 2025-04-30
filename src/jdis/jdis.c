@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <ctype.h>
+#include <stdint.h>
 #include "jdis.h"
 #include "../holdall/holdall.h"
 
@@ -67,12 +68,14 @@ static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
       if (wc) {
         continue;
       } else {
-        value_max *= MULT_COEFF;
-        *buffer = realloc(*buffer, (size_t) (value_max + 1));
-        if (*buffer == nullptr) {
-          free(*buffer);
+        size_t new_value_max = value_max * MULT_COEFF;
+        char *a = nullptr;
+        if (new_value_max > PTRDIFF_MAX / (sizeof (char *))
+            || (a = realloc(*buffer, (size_t) (new_value_max + 1))) == nullptr) {
           return EOF;
         }
+        value_max = new_value_max;
+        *buffer = a;
         p = *buffer + cptr;
       }
     }
