@@ -49,12 +49,6 @@ int holdall_put(holdall *ha, void *ref) {
     ha->cap *= CAPACITY_MUL;
     ha->aref = new_array;
   }
-  for (size_t i = 0; i < ha->count; ++i) {
-    char *val = ha->aref[i];
-    if (val == ref) {
-      return VALUE_ALREADY_EXIST;
-    }
-  }
   ha->aref[ha->count] = ref;
   ha->count += 1;
   return 0;
