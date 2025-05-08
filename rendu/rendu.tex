@@ -41,7 +41,7 @@ style=alphabetic,
     \node[align=center, text width=0.8\textwidth, font=\large] at (current page.center) [yshift=-1.5cm] {
         De-backer Cuvelier Sébastien Llobregat Nicolas};
     \node[align=center, text width=0.8\textwidth, font=\normalsize] at (current page.center) [yshift=-2.5cm] {
-        Version du 24 Avril 2025};
+        Version du 8 Mai 2025};
   \end{tikzpicture}
 }
 
@@ -106,7 +106,7 @@ Au début du projet, nous n'avions pas réellement conscience de la charge de tr
 Il aurait peut-être été intéressant de lors de la première séance de réaliser un planning
 avec un tableau de répartition des tâches pour définir une charge de travail équitable. Cependant,
 le projet n'étant pas de grande envergure et étant en effectif réduis à deux personnes nous 
-avons pu communiquer efficacement pour communiquer sur les tâches que nous étions réalisions. 
+avons pu communiquer efficacement sur les tâches que nous réalisions. 
 
 \section{Structure du projet}
 
@@ -140,7 +140,7 @@ afin de mettre en place son extension avec un tri par tas lui aussi vu au cours 
 \subsection{Gestion des options}
 \paragraph{Généralités :}
 Pour ce qui est de la gestion des options, nous avons décidé d'implanter à la fois les options longues et les options courtes.
-Les paragraphes qui suivent préciseront ce que ces options font et comment elles le font. Il est a noté que nous supportons pas
+Les paragraphes qui suivent préciseront ce que ces options font et comment elles le font. Il est a noté que nous ne supportons pas
 les préfixes des options longues pour ne pas créer de confusions.
 
 \paragraph{L'option -? / --help :}
@@ -173,18 +173,18 @@ tant que telle, la taille maximale d'un mot sera alors ULONG\_MAX ce qui est plu
 sortie erreur un message d'avertissement indiquant le mot qui a été coupé.
 
 \paragraph{L'option -p / --punctuation-like-space :}
-Cette option permet d'indiquer à la fonction de lecture que les caractères de ponctuation de la classe \texttt{isspace} et \texttt{ispunct}
-doivent être considérés comme des séparateurs pour segmentation des mots.
+Cette option permet d'indiquer à la fonction de lecture que les caractères de ponctuation de la classe \texttt{ispunct}
+doivent être considérés comme des séparateurs pour la segmentation des mots.
 
 \paragraph{L'option \texttt{--} :}
 Cette option permet d'échapper l'argument qui suit sur la ligne de commande. Si nous avons un fichier appelé 
 \texttt{--help}, par exemple, cette option nous permet de traiter ce fichier comme un fichier et non comme l'option \textbf{--help} ci-dessus.
-Cela se fait tout simplement par le fait d'effectuer le test de comparaison de la présence de l'option en premier afin de stocke rle nom du fichier.
+Cela se fait tout simplement par le fait d'effectuer le test de comparaison de la présence de l'option en premier afin de stocker le nom du fichier.
 
 \paragraph{L'option \texttt{-} :}
 Cette dernière option permet de rentrer des mots sur l'entrée standard pour qu'ils soient traité comme un fichier (voir \textbf{\ref{subsec:stdin}}).
 
-\paragraph{Toute autre option renvoie un message d'erreur associé et met fin au programme.}
+\paragraph{Toute autre option renvoie un message d'erreur associé et met fin à l'éxécution du programme.}
 
 \subsection{Gestions des fichiers}\label{subsec:files}
 Pour gérer les fichiers pris en arguments par le programme nous ouvrons simplement le fichier
@@ -428,7 +428,7 @@ J_{\delta}(A, B) =
 \paragraph{Calcul du cardinal de l'union :}
 Nous avons donc besoin du cardinal de l'intersection ainsi que le cardinal de l'union de chaque couple,
 pour cela nous allons en réalité ne calculer que le cardinal de l'intersection. En effet, nous allons utiliser
-une petite astuce de la théorie des ensembles qui nous dit que : Le cardinal de l'union de deux ensemble ce n'est rien d'autre
+une petite astuce de la théorie des ensembles qui nous dit que : Le cardinal de l'union de deux ensemble n'est rien d'autre
 que la somme de leurs cardinaux respectifs moins le cardinal de l'intersection. On peut facilement s'en rendre compte ici:
 
 \begin{center}
@@ -727,4 +727,11 @@ Nous pourrions améliorer notre projet en reprennant un holdall vu en TP que l'o
 Ce qui nous ferais gagner pas mal de temps. Pour cela nous pourrions stocker qu'un seul arbre 
 et ainsi avoir une structure dans chaque noeud.
 
+\paragraph{L'appartenance des mots :}
+Nous avons dans notre implémentation un arbre par fichier cependant ces arbres ne servent en réalité qu'à définir l'appartenance des mots
+ce qui est en réalité très couteux, la solution pourrait-être de revoir la structure de tout le projet et de n'avoir que l'arbre des unions
+ne contenant cette fois non pas un pointeur vers le mot mais une structure avec un témoin d'appartenance. Nous avions vu en cours le moyen de
+regarder sur un octet si a la k-ième place se trouvait un "1" nous pourrions donc théoriquement le mettre en pratique ici. Cela nous imposerait une
+limite de fichiers bien que nous pourrions avoir plusieurs size\_t pour cela. Dans le cas ou nous en utiliserions qu'un seul notre éxécutable ne pourrait
+alors supporter alors que 64 fichiers comme l'éxécutable d'exemple fournit. Par manque de temps nous n'avons pas pu revoir tout notre code.
 \end{document}
