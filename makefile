@@ -34,5 +34,6 @@ archive:
 		--exclude='rendu' \
 		--exclude='tests_jaccard' \
 		--exclude='jdis_prof' \
-		--exclude='jdis' \
+		--exclude='.vscode' \
+		--exclude='.idea' \
 		.
