@@ -42,7 +42,7 @@ void holdall_dispose(holdall **haptr) {
 int holdall_put(holdall *ha, void *ref) {
   if (ha->count == ha->cap) {
     void **new_array = realloc(ha->aref,
-        CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
+          CAPACITY_MUL * ha->cap * sizeof(*(ha->aref)));
     if (new_array == nullptr) {
       return LACK_OF_MEMORY;
     }
@@ -129,11 +129,11 @@ static void heapsort_down(char *base, size_t nmemb, size_t size,
     size_t droite = 2 * i + 2;
     size_t biggest = i;
     if (gauche < nmemb && compar(base + gauche * size,
-        base + biggest * size) > 0) {
+          base + biggest * size) > 0) {
       biggest = gauche;
     }
     if (droite < nmemb && compar(base + droite * size,
-        base + biggest * size) > 0) {
+          base + biggest * size) > 0) {
       biggest = droite;
     }
     if (biggest == i) {

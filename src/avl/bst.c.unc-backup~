@@ -52,11 +52,11 @@ static size_t min__size_t(size_t x1, size_t x2) {
 //    renvoyées par les appels récursifs de la fonction avec les pointeurs des
 //    sous-arbres gauche et droit de l'arbre comme paramètres.
 #define DEFUN_CBST__MEASURE(fun, oper)                                         \
-        static size_t cbst__ ## fun(const cbst * p) {                                \
-          return IS_EMPTY(p)                                                         \
-            ? 0                                                                      \
-            : 1 + oper(cbst__ ## fun(LEFT(p)), cbst__ ## fun(RIGHT(p)));             \
-        }
+  static size_t cbst__ ## fun(const cbst * p) {                                \
+    return IS_EMPTY(p)                                                         \
+      ? 0                                                                      \
+      : 1 + oper(cbst__ ## fun(LEFT(p)), cbst__ ## fun(RIGHT(p)));             \
+  }
 
 //  cbst__size, cbst__height, cbst__distance : définitions.
 
@@ -420,7 +420,7 @@ struct bst {
 
 //--- Fonctions bst ------------------------------------------------------------
 
-bst *bst_empty(int (*compar) (const void *, const void *)) {
+bst *bst_empty(int (*compar)(const void *, const void *)) {
   bst *t = malloc(sizeof *t);
   if (t == nullptr) {
     return nullptr;
@@ -491,5 +491,5 @@ int bst_dft_infix_apply_context(bst *t, int dir,
     void *context, int (*fun)(void *context, const void *ref),
     int (*fun_pre)(void *context), int (*fun_post)(void *context)) {
   return cbst__dft_infix_apply_context(t->root, dir, context, fun, fun_pre,
-      fun_post);
+        fun_post);
 }

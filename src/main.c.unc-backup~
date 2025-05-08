@@ -85,7 +85,7 @@ int graph_belonging(bst **t, bst *uni, int nb_file) {
   ctx->nb_bst = nb_file;
   ctx->t = t;
   bst_dft_infix_apply_context(uni, 1, ctx,
-      (int (*) (void *, const void *)) scptr_display, nullptr, nullptr);
+      (int (*)(void *, const void *)) scptr_display, nullptr, nullptr);
   free(ctx);
   return 0;
 }
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
   if (tab == nullptr) {
     goto dispose1;
   }
-  bst *uni_words = bst_empty((int (*) (const void *, const void *)) strcoll);
+  bst *uni_words = bst_empty((int (*)(const void *, const void *)) strcoll);
   if (uni_words == nullptr) {
     fprintf(stderr, "*** Erreur d'allocation sur l'union\n");
     goto dispose2;

@@ -37,7 +37,7 @@ size_t card_intersection(bst *p, bst *q) {
     context->apply_set = p;
   }
   bst_dft_infix_apply_context(apply, 0, context,
-      (int (*)(void *context, const void *ref)) is_in, nullptr, nullptr);
+      (int (*) (void *context, const void *ref)) is_in, nullptr, nullptr);
   size_t res = context->cptr;
   free(context);
   return res;
@@ -70,8 +70,9 @@ static int hm__fscanf(FILE *stream, size_t value_max, char **buffer, bool wp,
       } else {
         size_t new_value_max = value_max * MULT_COEFF;
         char *a = nullptr;
-        if (new_value_max > PTRDIFF_MAX / (sizeof (char *))
-            || (a = realloc(*buffer, (size_t) (new_value_max + 1))) == nullptr) {
+        if (new_value_max > PTRDIFF_MAX / (sizeof(char *))
+            || (a = realloc(*buffer,
+                (size_t) (new_value_max + 1))) == nullptr) {
           return EOF;
         }
         value_max = new_value_max;
@@ -125,7 +126,7 @@ bst *file_to_bst(char *file_name, size_t value_max, bool wp, bst *uni_words,
       return nullptr;
     }
   }
-  bst *bst_f = bst_empty((int (*)(const void *, const void *)) strcoll);
+  bst *bst_f = bst_empty((int (*) (const void *, const void *)) strcoll);
   if (bst_f == nullptr) {
     fclose(p);
     return nullptr;
