@@ -25,10 +25,14 @@ $(makefile_indicator): makefile
 	@$(RM) $(objects) $(executable)
 
 archive:
-	tar -cvf ../projet.tar \
+	tar -cvf ../cuvelseb.tar \
 		--exclude='.git' \
 		--exclude='.gitignore' \
 		--exclude='textes' \
 		--exclude='tests.sh' \
 		--exclude='README.md' \
+		--exclude='rendu' \
+		--exclude='tests_jaccard' \
+		--exclude='jdis_prof' \
+		--exclude='jdis' \
 		.
