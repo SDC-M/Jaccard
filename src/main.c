@@ -175,8 +175,7 @@ int main(int argc, char *argv[]) {
       for (int j = 0; j < i; ++j) {
         bst_dispose(&tab[j]);
       }
-      free(tab);
-      return EXIT_FAILURE;
+      goto dispose2;
     }
   }
   if (graph) {
