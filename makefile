@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -std=c2x \
   -Wall -Wconversion -Werror -Wextra -Wpedantic -Wwrite-strings \
-  -O0 -g3
+  -O2
 src = $(shell find ./src/ -name '*.c')
 executable = jdis
 
@@ -25,7 +25,7 @@ $(makefile_indicator): makefile
 	@$(RM) $(objects) $(executable)
 
 archive:
-	@tar -cvf ../cuvelseb.tar \
+	@tar -cvzf ../cuvelseb_projet.tar.gz \
 		--exclude='.git' \
 		--exclude='.gitignore' \
 		--exclude='textes' \
