@@ -44,8 +44,12 @@ size_t card_intersection(bst *p, bst *q) {
 }
 
 double jdis(bst *p, bst *q, size_t card_interction) {
+  size_t card_uni = bst_size(p) + bst_size(q);
+  if (card_uni == 0) {
+    return 0.;
+  }
   return 1. - (double) card_interction
-    / ((double) bst_size(p) + (double) bst_size(q) - (double) card_interction);
+    / ((double) card_uni - (double) card_interction);
 }
 
 // hm__fscanf : tente de lire dans le fichier pointé par stream au plus
